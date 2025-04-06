@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Return Parts Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-gray-50 p-5">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header with home icon and title -->
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center space-x-3">
+                <a href="spareparts.html" class="text-blue-600 hover:text-blue-800 transition-colors">
+                    <i class="fas fa-home text-2xl"></i>
+                </a>
+                <h1 class="text-2xl font-bold text-gray-800"> Return Parts Management</h1>
+            </div>
+            <div class="text-gray-600 font-medium">
+                <span id="current-date" class="bg-white px-3 py-1 rounded-lg shadow-sm"></span>
+            </div>
+        </div>
+
+        <!-- Card container -->
+        <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+            <!-- Search and Add parts section -->
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                <div class="relative w-full sm:w-96">
+                    <input type="text" id="search-input" placeholder="Search by hospital, part name or number..."
+                        class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all">
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                </div>
+                <button id="add-parts-btn"
+                    class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors shadow-md flex items-center justify-center gap-2">
+                    <i class="fas fa-plus"></i> Add Parts
+                </button>
+            </div>
+
+            <!-- Table -->
+            <div class="overflow-x-auto rounded-lg border border-gray-200">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                S.N</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Hospital Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Parts Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Parts Number</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Required Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Quantity</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="parts-table-body" class="bg-white divide-y divide-gray-200">
+                        <!-- Table rows will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex items-center justify-between mt-4 px-2">
+                <div class="text-sm text-gray-600">
+                    Showing <span id="showing-from">1</span> to <span id="showing-to">5</span> of <span
+                        id="total-items">15</span> entries
+                </div>
+                <div class="flex space-x-1">
+                    <button id="prev-page" class="px-3 py-1 rounded border bg-white text-gray-700 disabled:opacity-50">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="px-3 py-1 rounded border bg-blue-600 text-white">1</button>
+                    <button class="px-3 py-1 rounded border bg-white text-gray-700 hover:bg-gray-100">2</button>
+                    <button class="px-3 py-1 rounded border bg-white text-gray-700 hover:bg-gray-100">3</button>
+                    <button id="next-page" class="px-3 py-1 rounded border bg-white text-gray-700">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Parts Modal (hidden by default) -->
+    <div id="add-parts-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Add Return Parts</h3>
+                <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="parts-form" class="space-y-4">
+                <div>
+                    <label for="hospital-name" class="block text-sm font-medium text-gray-700 mb-1">Hospital
+                        Name</label>
+                    <input type="text" id="hospital-name" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="part-name" class="block text-sm font-medium text-gray-700 mb-1">Part Name</label>
+                    <input type="text" id="part-name" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="part-number" class="block text-sm font-medium text-gray-700 mb-1">Part Number</label>
+                    <input type="text" id="part-number" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="required-date" class="block text-sm font-medium text-gray-700 mb-1">Return
+                        Date</label>
+                    <input type="date" id="required-date" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="quantity" class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+                    <input type="number" id="quantity" min="1" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" id="cancel-add"
+                        class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</button>
+                    <button type="submit"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Details Modal (hidden by default) -->
+    <div id="details-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Part Details</h3>
+                <button id="close-details-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="details-content" class="space-y-3">
+                <!-- Details will be populated by JavaScript -->
+            </div>
+            <div class="flex justify-end pt-4">
+                <button id="close-details"
+                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        const partsData = [
+            { id: 1, hospital: "City General Hospital", partName: "MRI Coil", partNumber: "MC-4500", requiredDate: "2025-05-15", quantity: 2, status: "Pending" },
+            { id: 2, hospital: "Regional Medical Center", partName: "X-Ray Tube", partNumber: "XT-7800", requiredDate: "2025-04-28", quantity: 1, status: "Shipped" },
+            { id: 3, hospital: "University Hospital", partName: "Ultrasound Probe", partNumber: "UP-3200", requiredDate: "2025-05-02", quantity: 3, status: "Processing" },
+            { id: 4, hospital: "Children's Hospital", partName: "ECG Electrodes", partNumber: "EE-1120", requiredDate: "2025-04-20", quantity: 50, status: "Delivered" },
+            { id: 5, hospital: "Veterans Hospital", partName: "Defibrillator Pads", partNumber: "DP-5500", requiredDate: "2025-05-10", quantity: 4, status: "Pending" },
+            { id: 6, hospital: "Community Clinic", partName: "Blood Pressure Cuff", partNumber: "BP-2200", requiredDate: "2025-04-25", quantity: 8, status: "Processing" },
+            { id: 7, hospital: "City General Hospital", partName: "Surgical Light Bulb", partNumber: "SL-4000", requiredDate: "2025-05-05", quantity: 6, status: "Shipped" }
+        ];
+
+        // DOM elements
+        const currentDateEl = document.getElementById('current-date');
+        const searchInput = document.getElementById('search-input');
+        const addPartsBtn = document.getElementById('add-parts-btn');
+        const partsTableBody = document.getElementById('parts-table-body');
+        const addPartsModal = document.getElementById('add-parts-modal');
+        const closeModal = document.getElementById('close-modal');
+        const cancelAdd = document.getElementById('cancel-add');
+        const partsForm = document.getElementById('parts-form');
+        const detailsModal = document.getElementById('details-modal');
+        const closeDetailsModal = document.getElementById('close-details-modal');
+        const closeDetails = document.getElementById('close-details');
+        const detailsContent = document.getElementById('details-content');
+
+        // Set current date
+        const today = new Date();
+        currentDateEl.textContent = today.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            weekday: 'long'
+        });
+
+        // Render table rows
+        function renderTable(data) {
+            partsTableBody.innerHTML = '';
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50 transition-colors';
+                row.innerHTML = `
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.id}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.hospital}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.partName}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.partNumber}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.requiredDate}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.quantity}</td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="px-2 py-1 text-xs rounded-full ${getStatusClass(item.status)}">${item.status}</span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+            <button class="text-blue-600 hover:text-blue-900 mr-3 details-btn" data-id="${item.id}">Details</button>
+            <button class="text-green-600 hover:text-green-900 edit-btn" data-id="${item.id}">Edit</button>
+          </td>
+        `;
+                partsTableBody.appendChild(row);
+            });
+
+            // Add event listeners to details buttons
+            document.querySelectorAll('.details-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = parseInt(e.target.getAttribute('data-id'));
+                    showDetails(id);
+                });
+            });
+        }
+
+        // Get status class for styling
+        function getStatusClass(status) {
+            switch (status.toLowerCase()) {
+                case 'pending': return 'bg-yellow-100 text-yellow-800';
+                case 'processing': return 'bg-blue-100 text-blue-800';
+                case 'shipped': return 'bg-purple-100 text-purple-800';
+                case 'delivered': return 'bg-green-100 text-green-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        // Show details modal
+        function showDetails(id) {
+            const item = partsData.find(part => part.id === id);
+            if (item) {
+                detailsContent.innerHTML = `
+          <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-2 bg-gray-50 p-3 rounded-lg">
+              <h4 class="font-medium text-gray-900">${item.partName} (${item.partNumber})</h4>
+              <p class="text-sm text-gray-600">${item.hospital}</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500">Required Date</p>
+              <p class="font-medium">${item.requiredDate}</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500">Quantity</p>
+              <p class="font-medium">${item.quantity}</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500">Status</p>
+              <p class="font-medium"><span class="${getStatusClass(item.status)} px-2 py-1 rounded-full text-xs">${item.status}</span></p>
+            </div>
+            <div class="col-span-2 pt-3">
+              <p class="text-sm text-gray-500">Notes</p>
+              <p class="text-sm text-gray-700 mt-1">No additional notes available for this part.</p>
+            </div>
+          </div>
+        `;
+                detailsModal.classList.remove('hidden');
+            }
+        }
+
+        // Search functionality
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredData = partsData.filter(item =>
+                item.hospital.toLowerCase().includes(searchTerm) ||
+                item.partName.toLowerCase().includes(searchTerm) ||
+                item.partNumber.toLowerCase().includes(searchTerm)
+            );
+            renderTable(filteredData);
+        });
+
+        // Modal controls
+        addPartsBtn.addEventListener('click', () => {
+            addPartsModal.classList.remove('hidden');
+        });
+
+        closeModal.addEventListener('click', () => {
+            addPartsModal.classList.add('hidden');
+        });
+
+        cancelAdd.addEventListener('click', () => {
+            addPartsModal.classList.add('hidden');
+        });
+
+        closeDetailsModal.addEventListener('click', () => {
+            detailsModal.classList.add('hidden');
+        });
+
+        closeDetails.addEventListener('click', () => {
+            detailsModal.classList.add('hidden');
+        });
+
+        // Form submission
+        partsForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            // In a real app, you would send this data to a server
+            const newPart = {
+                id: partsData.length + 1,
+                hospital: document.getElementById('hospital-name').value,
+                partName: document.getElementById('part-name').value,
+                partNumber: document.getElementById('part-number').value,
+                requiredDate: document.getElementById('required-date').value,
+                quantity: parseInt(document.getElementById('quantity').value),
+                status: "Pending"
+            };
+
+            partsData.unshift(newPart);
+            renderTable(partsData);
+            partsForm.reset();
+            addPartsModal.classList.add('hidden');
+
+            // Show success message
+            alert('Part added successfully!');
+        });
+
+        // Initial render
+        renderTable(partsData);
+    </script>
+</body>
+
+</html>

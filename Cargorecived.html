@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cargo Received</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .input-focus {
+            transition: all 0.2s ease;
+        }
+
+        .input-focus:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+
+        .table-container {
+            max-height: calc(100vh - 380px);
+            overflow-y: auto;
+        }
+
+        .edit-mode {
+            background-color: #f0fff4;
+        }
+
+        .edit-button {
+            background-color: #38a169;
+        }
+
+        .edit-button:hover {
+            background-color: #2f855a;
+        }
+
+        .pagination-active {
+            background-color: #38a169;
+            color: white;
+            border-color: #38a169;
+        }
+
+        @media (max-width: 768px) {
+            .responsive-form {
+                flex-direction: column;
+            }
+
+            .responsive-form input,
+            .responsive-form select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-green-600 to-green-800 shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <i class="fas fa-truck-loading text-white text-2xl mr-3"></i>
+                    <h1 class="text-2xl font-bold text-white">Cargo Received</h1>
+                </div>
+                <div class="text-white flex items-center">
+                    <span id="currentDate" class="text-green-100"></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6">
+        <!-- Search Section -->
+        <div class="mb-6 max-w-2xl mx-auto">
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fas fa-search text-gray-400"></i>
+                </div>
+                <input type="text" id="searchInput" placeholder="Search by Goods Name or Cargo Serial Number"
+                    class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 input-focus"
+                    onkeyup="searchTable()">
+            </div>
+        </div>
+
+        <!-- Form Section -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Add Received Cargo</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 responsive-form">
+                <div>
+                    <label for="goodsName" class="block text-sm font-medium text-gray-700 mb-1">Goods Name</label>
+                    <input type="text" id="goodsName" placeholder="Enter Goods Name"
+                        class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 input-focus">
+                </div>
+                <div>
+                    <label for="transport" class="block text-sm font-medium text-gray-700 mb-1">Transport</label>
+                    <select id="transport"
+                        class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 input-focus">
+                        <option value="Road">Road</option>
+                        <option value="Air">Air</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="date" class="block text-sm font-medium text-gray-700 mb-1">Date Received</label>
+                    <input type="date" id="date"
+                        class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 input-focus">
+                </div>
+                <div>
+                    <label for="receivedBy" class="block text-sm font-medium text-gray-700 mb-1">Received By</label>
+                    <input type="text" id="receivedBy" placeholder="Receiver Name"
+                        class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 input-focus">
+                </div>
+                <div>
+                    <label for="weight" class="block text-sm font-medium text-gray-700 mb-1">Weight (kg)</label>
+                    <input type="number" id="weight" placeholder="Weight"
+                        class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 input-focus">
+                </div>
+                <div>
+                    <label for="cargoSN" class="block text-sm font-medium text-gray-700 mb-1">Cargo S/N</label>
+                    <input type="text" id="cargoSN" placeholder="Serial Number"
+                        class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 input-focus">
+                </div>
+            </div>
+            <div class="mt-4 flex justify-end">
+                <button onclick="addRow()"
+                    class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg shadow transition-colors duration-200 flex items-center">
+                    <i class="fas fa-plus-circle mr-2"></i> Add Cargo
+                </button>
+            </div>
+        </div>
+
+        <!-- Table Section -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden mb-4">
+            <div class="table-container">
+                <table class="w-full">
+                    <thead class="bg-green-100 text-green-800">
+                        <tr>
+                            <th class="px-4 py-3 text-left font-semibold text-sm uppercase tracking-wider">#</th>
+                            <th class="px-4 py-3 text-left font-semibold text-sm uppercase tracking-wider">Goods Name
+                            </th>
+                            <th class="px-4 py-3 text-left font-semibold text-sm uppercase tracking-wider">Transport
+                            </th>
+                            <th class="px-4 py-3 text-left font-semibold text-sm uppercase tracking-wider">Date</th>
+                            <th class="px-4 py-3 text-left font-semibold text-sm uppercase tracking-wider">Received By
+                            </th>
+                            <th class="px-4 py-3 text-left font-semibold text-sm uppercase tracking-wider">Weight (kg)
+                            </th>
+                            <th class="px-4 py-3 text-left font-semibold text-sm uppercase tracking-wider">Cargo S/N
+                            </th>
+                            <th class="px-4 py-3 text-left font-semibold text-sm uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200" id="dataTable">
+                        <!-- Rows will be added dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div
+            class="flex flex-col sm:flex-row items-center justify-between px-4 py-3 bg-white border-t border-gray-200 sm:px-6 rounded-b-xl">
+            <div class="mb-2 sm:mb-0">
+                <p class="text-sm text-gray-700">
+                    Showing <span id="startItem" class="font-medium">1</span> to <span id="endItem"
+                        class="font-medium">10</span> of <span id="totalItems" class="font-medium">0</span> results
+                </p>
+            </div>
+            <div class="flex space-x-1">
+                <button onclick="previousPage()" id="prevBtn"
+                    class="relative inline-flex items-center px-3 py-1 rounded-l border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled>
+                    Previous
+                </button>
+                <div id="pageNumbers" class="flex">
+                    <!-- Page numbers will be added dynamically -->
+                </div>
+                <button onclick="nextPage()" id="nextBtn"
+                    class="relative inline-flex items-center px-3 py-1 rounded-r border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled>
+                    Next
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Home Button (Floating at bottom right) -->
+    <div class="fixed bottom-6 right-6">
+        <a href="Home.html"
+            class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-green-600 hover:bg-green-700 text-white shadow-lg transition-all duration-200 transform hover:scale-110">
+            <i class="fas fa-home text-xl"></i>
+        </a>
+    </div>
+
+    <script>
+        // Global variables for pagination
+        let currentPage = 1;
+        const rowsPerPage = 10;
+        let allData = [];
+
+        // Display current date
+        function displayDate() {
+            const today = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = today.toLocaleDateString('en-US', options);
+        }
+
+        function addRow() {
+            let goodsName = document.getElementById("goodsName").value;
+            let transport = document.getElementById("transport").value;
+            let date = document.getElementById("date").value;
+            let receivedBy = document.getElementById("receivedBy").value;
+            let weight = document.getElementById("weight").value;
+            let cargoSN = document.getElementById("cargoSN").value;
+
+            if (!goodsName || !date || !receivedBy || !weight || !cargoSN) {
+                alert("Please fill all required fields.");
+                return;
+            }
+
+            const newItem = {
+                id: Date.now(),
+                goodsName,
+                transport,
+                date,
+                receivedBy,
+                weight,
+                cargoSN
+            };
+
+            allData.unshift(newItem); // Add to beginning of array
+            renderTable();
+            clearInputs();
+        }
+
+        function renderTable() {
+            const table = document.getElementById("dataTable");
+            table.innerHTML = '';
+
+            // Calculate pagination
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = Math.min(startIndex + rowsPerPage, allData.length);
+            const paginatedData = allData.slice(startIndex, endIndex);
+
+            // Update pagination info
+            document.getElementById("startItem").textContent = startIndex + 1;
+            document.getElementById("endItem").textContent = endIndex;
+            document.getElementById("totalItems").textContent = allData.length;
+
+            // Enable/disable pagination buttons
+            document.getElementById("prevBtn").disabled = currentPage === 1;
+            document.getElementById("nextBtn").disabled = endIndex >= allData.length;
+
+            // Render table rows
+            paginatedData.forEach((item, index) => {
+                const row = table.insertRow();
+                row.innerHTML = `
+                    <td class="px-4 py-3 whitespace-nowrap">${startIndex + index + 1}</td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                        <input type="text" value="${item.goodsName}" class="w-full p-1 rounded border border-gray-300 focus:ring-1 focus:ring-green-500" readonly>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                        <select class="w-full p-1 rounded border border-gray-300 focus:ring-1 focus:ring-green-500" disabled>
+                            <option value="Road" ${item.transport === "Road" ? "selected" : ""}>Road</option>
+                            <option value="Air" ${item.transport === "Air" ? "selected" : ""}>Air</option>
+                        </select>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                        <input type="date" value="${item.date}" class="w-full p-1 rounded border border-gray-300 focus:ring-1 focus:ring-green-500" readonly>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                        <input type="text" value="${item.receivedBy}" class="w-full p-1 rounded border border-gray-300 focus:ring-1 focus:ring-green-500" readonly>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                        <input type="number" value="${item.weight}" class="w-full p-1 rounded border border-gray-300 focus:ring-1 focus:ring-green-500" readonly>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                        <input type="text" value="${item.cargoSN}" class="w-full p-1 rounded border border-gray-300 focus:ring-1 focus:ring-green-500" readonly>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap space-x-2">
+                        <button class="edit-button bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded shadow transition-colors duration-200" onclick="editRow(this, ${item.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded shadow transition-colors duration-200" onclick="deleteRow(this, ${item.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+            });
+
+            renderPaginationButtons();
+        }
+
+        function renderPaginationButtons() {
+            const totalPages = Math.ceil(allData.length / rowsPerPage);
+            const pageNumbersContainer = document.getElementById("pageNumbers");
+            pageNumbersContainer.innerHTML = '';
+
+            // Always show first page
+            if (totalPages > 0) {
+                const firstPageBtn = document.createElement('button');
+                firstPageBtn.textContent = '1';
+                firstPageBtn.className = `relative inline-flex items-center px-3 py-1 border text-sm font-medium ${currentPage === 1 ? 'pagination-active' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'}`;
+                firstPageBtn.onclick = () => goToPage(1);
+                pageNumbersContainer.appendChild(firstPageBtn);
+            }
+
+            // Show ellipsis if needed
+            if (currentPage > 3 && totalPages > 3) {
+                const ellipsis = document.createElement('span');
+                ellipsis.textContent = '...';
+                ellipsis.className = 'px-3 py-1';
+                pageNumbersContainer.appendChild(ellipsis);
+            }
+
+            // Show current page and neighbors
+            const startPage = Math.max(2, currentPage - 1);
+            const endPage = Math.min(totalPages - 1, currentPage + 1);
+
+            for (let i = startPage; i <= endPage; i++) {
+                if (i > 1 && i < totalPages) {
+                    const pageBtn = document.createElement('button');
+                    pageBtn.textContent = i;
+                    pageBtn.className = `relative inline-flex items-center px-3 py-1 border text-sm font-medium ${currentPage === i ? 'pagination-active' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'}`;
+                    pageBtn.onclick = () => goToPage(i);
+                    pageNumbersContainer.appendChild(pageBtn);
+                }
+            }
+
+            // Show ellipsis if needed
+            if (currentPage < totalPages - 2 && totalPages > 3) {
+                const ellipsis = document.createElement('span');
+                ellipsis.textContent = '...';
+                ellipsis.className = 'px-3 py-1';
+                pageNumbersContainer.appendChild(ellipsis);
+            }
+
+            // Always show last page if there are multiple pages
+            if (totalPages > 1) {
+                const lastPageBtn = document.createElement('button');
+                lastPageBtn.textContent = totalPages;
+                lastPageBtn.className = `relative inline-flex items-center px-3 py-1 border text-sm font-medium ${currentPage === totalPages ? 'pagination-active' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'}`;
+                lastPageBtn.onclick = () => goToPage(totalPages);
+                pageNumbersContainer.appendChild(lastPageBtn);
+            }
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            renderTable();
+        }
+
+        function nextPage() {
+            if (currentPage * rowsPerPage < allData.length) {
+                currentPage++;
+                renderTable();
+            }
+        }
+
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable();
+            }
+        }
+
+        function editRow(button, id) {
+            let row = button.closest('tr');
+            row.classList.add('edit-mode');
+
+            // Enable all inputs in the row
+            let inputs = row.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.readOnly = false;
+            });
+
+            // Enable select
+            let select = row.querySelector('select');
+            select.disabled = false;
+
+            // Change button to save button
+            button.innerHTML = '<i class="fas fa-save"></i>';
+            button.onclick = function () { saveRow(this, id); };
+            button.classList.remove('edit-button');
+            button.classList.add('bg-blue-500', 'hover:bg-blue-600');
+        }
+
+        function saveRow(button, id) {
+            let row = button.closest('tr');
+            row.classList.remove('edit-mode');
+
+            // Get updated values
+            const goodsName = row.cells[1].querySelector('input').value;
+            const transport = row.cells[2].querySelector('select').value;
+            const date = row.cells[3].querySelector('input').value;
+            const receivedBy = row.cells[4].querySelector('input').value;
+            const weight = row.cells[5].querySelector('input').value;
+            const cargoSN = row.cells[6].querySelector('input').value;
+
+            // Update the data in our array
+            const itemIndex = allData.findIndex(item => item.id === id);
+            if (itemIndex !== -1) {
+                allData[itemIndex] = {
+                    ...allData[itemIndex],
+                    goodsName,
+                    transport,
+                    date,
+                    receivedBy,
+                    weight,
+                    cargoSN
+                };
+            }
+
+            // Disable all inputs in the row
+            let inputs = row.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.readOnly = true;
+            });
+
+            // Disable select
+            let select = row.querySelector('select');
+            select.disabled = true;
+
+            // Change button back to edit button
+            button.innerHTML = '<i class="fas fa-edit"></i>';
+            button.onclick = function () { editRow(this, id); };
+            button.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+            button.classList.add('edit-button');
+
+            alert("Changes saved successfully!");
+        }
+
+        function deleteRow(button, id) {
+            if (confirm("Are you sure you want to delete this cargo record?")) {
+                allData = allData.filter(item => item.id !== id);
+                renderTable();
+            }
+        }
+
+        function clearInputs() {
+            document.getElementById("goodsName").value = "";
+            document.getElementById("transport").value = "Road";
+            document.getElementById("date").value = "";
+            document.getElementById("receivedBy").value = "";
+            document.getElementById("weight").value = "";
+            document.getElementById("cargoSN").value = "";
+        }
+
+        function searchTable() {
+            const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+
+            if (searchTerm === '') {
+                renderTable();
+                return;
+            }
+
+            const filteredData = allData.filter(item =>
+                item.goodsName.toLowerCase().includes(searchTerm) ||
+                item.cargoSN.toLowerCase().includes(searchTerm)
+            );
+
+            // Temporarily display filtered data
+            const table = document.getElementById("dataTable");
+            table.innerHTML = '';
+
+            filteredData.forEach((item, index) => {
+                const row = table.insertRow();
+                row.innerHTML = `
+                    <td class="px-4 py-3 whitespace-nowrap">${index + 1}</td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                        <input type="text" value="${item.goodsName}" class="w-full p-1 rounded border border-gray-300 focus:ring-1 focus:ring-green-500" readonly>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                        <select class="w-full p-1 rounded border border-gray-300 focus:ring-1 focus:ring-green-500" disabled>
+                            <option value="Road" ${item.transport === "Road" ? "selected" : ""}>Road</option>
+                            <option value="Air" ${item.transport === "Air" ? "selected" : ""}>Air</option>
+                        </select>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                        <input type="date" value="${item.date}" class="w-full p-1 rounded border border-gray-300 focus:ring-1 focus:ring-green-500" readonly>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                        <input type="text" value="${item.receivedBy}" class="w-full p-1 rounded border border-gray-300 focus:ring-1 focus:ring-green-500" readonly>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                        <input type="number" value="${item.weight}" class="w-full p-1 rounded border border-gray-300 focus:ring-1 focus:ring-green-500" readonly>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                        <input type="text" value="${item.cargoSN}" class="w-full p-1 rounded border border-gray-300 focus:ring-1 focus:ring-green-500" readonly>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap space-x-2">
+                        <button class="edit-button bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded shadow transition-colors duration-200" onclick="editRow(this, ${item.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded shadow transition-colors duration-200" onclick="deleteRow(this, ${item.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+            });
+        }
+
+        // Initialize
+        window.onload = function () {
+            displayDate();
+            // Set default date to today
+            document.getElementById('date').valueAsDate = new Date();
+            renderTable();
+        };
+    </script>
+</body>
+
+</html>

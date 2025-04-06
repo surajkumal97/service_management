@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pending PM Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .table-container {
+            max-height: calc(100vh - 220px);
+            overflow-y: auto;
+        }
+
+        .complete-btn {
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-size: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        #imagePreviewModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 90%;
+            max-height: 90%;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen">
+    <!-- Header with integrated search -->
+    <header class="bg-gradient-to-r from-blue-600 to-blue-800 shadow-lg">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-2">
+                <div class="flex items-center">
+                    <i class="fas fa-tools text-white text-xl mr-2"></i>
+                    <h1 class="text-xl font-bold text-white">Pending PM</h1>
+                </div>
+
+                <!-- Compact Search -->
+                <div class="relative w-full md:w-64">
+                    <div class="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-300 text-sm"></i>
+                    </div>
+                    <input type="text" id="searchInput" placeholder="Search S.N or Hospital"
+                        class="block w-full pl-8 pr-3 py-1 text-sm border border-blue-400 rounded-md bg-blue-500 bg-opacity-20 text-white placeholder-blue-200 focus:outline-none focus:ring-1 focus:ring-blue-300 focus:bg-blue-600 focus:bg-opacity-30"
+                        onkeyup="searchTable()">
+                </div>
+
+                <div class="text-white flex items-center text-sm">
+                    <span id="currentDate" class="hidden sm:inline mr-3"></span>
+                    <span id="realTimeClock"></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-4">
+        <!-- Table Section -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="table-container">
+                <table class="w-full text-sm">
+                    <thead class="bg-blue-100 text-blue-800">
+                        <tr>
+                            <th class="px-4 py-2 text-left">Hospital</th>
+                            <th class="px-4 py-2 text-left">Brand</th>
+                            <th class="px-4 py-2 text-left">Model</th>
+                            <th class="px-4 py-2 text-left">S.N</th>
+                            <th class="px-4 py-2 text-left">Due Date</th>
+                            <th class="px-4 py-2 text-left">Status</th>
+                            <th class="px-4 py-2 text-left">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200" id="equipmentTable">
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-2">Example Hospital</td>
+                            <td class="px-4 py-2">Brand X</td>
+                            <td class="px-4 py-2">Model Y</td>
+                            <td class="px-4 py-2 font-medium">SN123456</td>
+                            <td class="px-4 py-2">2024-04-01</td>
+                            <td class="px-4 py-2">
+                                <span class="px-2 inline-flex text-xs rounded-full bg-yellow-100 text-yellow-800">
+                                    Pending
+                                </span>
+                            </td>
+                            <td class="px-4 py-2">
+                                <button onclick="completePM(this)"
+                                    class="complete-btn bg-green-100 text-green-600 hover:bg-green-200">
+                                    <i class="fas fa-check-circle"></i> Complete PM
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 bg-gray-50">
+                            <td class="px-4 py-2">Another Hospital</td>
+                            <td class="px-4 py-2">Brand A</td>
+                            <td class="px-4 py-2">Model B</td>
+                            <td class="px-4 py-2 font-medium">SN654321</td>
+                            <td class="px-4 py-2">2024-04-02</td>
+                            <td class="px-4 py-2">
+                                <span class="px-2 inline-flex text-xs rounded-full bg-red-100 text-red-800">
+                                    Overdue
+                                </span>
+                            </td>
+                            <td class="px-4 py-2">
+                                <button onclick="completePM(this)"
+                                    class="complete-btn bg-green-100 text-green-600 hover:bg-green-200">
+                                    <i class="fas fa-check-circle"></i> Complete PM
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Home Button -->
+    <div class="fixed bottom-4 right-4">
+        <a href="Home.html"
+            class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-md transition-all">
+            <i class="fas fa-home text-lg"></i>
+        </a>
+    </div>
+
+    <script>
+        // Update real-time clock and date
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById("realTimeClock").textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            document.getElementById("currentDate").textContent = now.toLocaleDateString();
+        }
+        setInterval(updateDateTime, 1000);
+        updateDateTime();
+
+        // Search functionality
+        function searchTable() {
+            let input = document.getElementById("searchInput").value.toLowerCase();
+            let rows = document.querySelectorAll("#equipmentTable tbody tr");
+
+            rows.forEach(row => {
+                let sn = row.cells[3].textContent.toLowerCase();
+                let hospital = row.cells[0].textContent.toLowerCase();
+                row.style.display = (sn.includes(input) || hospital.includes(input)) ? "" : "none";
+            });
+        }
+
+        // Complete PM function
+        function completePM(button) {
+            const row = button.closest('tr');
+            const statusCell = row.cells[5];
+            statusCell.innerHTML = `<span class="px-2 inline-flex text-xs rounded-full bg-green-100 text-green-800">Completed</span>`;
+            button.disabled = true;
+            button.classList.add("opacity-50", "cursor-not-allowed");
+            button.innerHTML = '<i class="fas fa-check"></i> Completed';
+
+            // Show confirmation
+            alert('PM marked as completed successfully!');
+        }
+    </script>
+</body>
+
+</html>

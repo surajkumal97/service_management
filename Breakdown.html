@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breakdown Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --success: #10b981;
+            --success-hover: #059669;
+            --warning: #f59e0b;
+            --warning-hover: #d97706;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-card {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .form-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-input {
+            transition: all 0.3s ease;
+            border: 1px solid #d1d5db;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn {
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background-color: var(--danger-hover);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+
+        .btn-success:hover {
+            background-color: var(--success-hover);
+        }
+
+        .btn-warning {
+            background-color: var(--warning);
+        }
+
+        .btn-warning:hover {
+            background-color: var(--warning-hover);
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            margin-right: 1rem;
+        }
+
+        .radio-custom {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #9ca3af;
+            border-radius: 50%;
+            margin-right: 8px;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+
+        input[type="radio"]:checked+.radio-custom {
+            border-color: var(--primary);
+        }
+
+        input[type="radio"]:checked+.radio-custom::after {
+            content: "";
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 10px;
+            height: 10px;
+            background-color: var(--primary);
+            border-radius: 50%;
+        }
+
+        .status-complete {
+            color: var(--success);
+        }
+
+        .status-incomplete {
+            color: var(--danger);
+        }
+
+        .status-partial {
+            color: var(--warning);
+        }
+
+        .animate-bounce {
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .toast {
+            animation: slideIn 0.5s, fadeOut 0.5s 2.5s forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
+
+        .signature-box {
+            border: 2px dashed #d1d5db;
+            border-radius: 0.5rem;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .signature-box:hover {
+            border-color: var(--primary);
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+
+        .signature-pad {
+            width: 100%;
+            height: 100%;
+            background-color: white;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Home Button -->
+        <a href="Home.html"
+            class="fixed bottom-6 left-6 z-10 flex items-center justify-center w-12 h-12 bg-indigo-600 text-white rounded-full shadow-lg hover:bg-indigo-700 transition-all duration-300 animate-bounce">
+            <i class="fas fa-home text-xl"></i>
+        </a>
+
+        <!-- Main Form Card -->
+        <div class="bg-white rounded-xl form-card overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-6 text-white">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold">Breakdown Report</h1>
+                        <p id="currentDate" class="text-blue-100 mt-1"></p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 p-3 rounded-full">
+                        <i class="fas fa-exclamation-triangle text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Content -->
+            <form id="breakdownForm" class="p-6 space-y-6">
+                <!-- Equipment Information -->
+                <div class="space-y-4">
+                    <h2 class="text-xl font-semibold text-gray-800 border-b pb-2 flex items-center">
+                        <i class="fas fa-laptop-medical mr-2 text-blue-600"></i> Equipment Information
+                    </h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Hospital Name <span
+                                    class="text-red-500">*</span></label>
+                            <input type="text" required class="w-full form-input px-4 py-2 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Brand Name <span
+                                    class="text-red-500">*</span></label>
+                            <input type="text" required class="w-full form-input px-4 py-2 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">System Model <span
+                                    class="text-red-500">*</span></label>
+                            <input type="text" required class="w-full form-input px-4 py-2 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">System S/N <span
+                                    class="text-red-500">*</span></label>
+                            <input type="text" required class="w-full form-input px-4 py-2 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Software Version</label>
+                            <input type="text" class="w-full form-input px-4 py-2 rounded-lg">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Problem Details -->
+                <div class="space-y-4">
+                    <h2 class="text-xl font-semibold text-gray-800 border-b pb-2 flex items-center">
+                        <i class="fas fa-bug mr-2 text-red-500"></i> Problem Details
+                    </h2>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Problem Description <span
+                                class="text-red-500">*</span></label>
+                        <textarea required rows="4" class="w-full form-input px-4 py-2 rounded-lg"
+                            placeholder="Describe the problem encountered..."></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Work Performed <span
+                                class="text-red-500">*</span></label>
+                        <textarea required rows="4" class="w-full form-input px-4 py-2 rounded-lg"
+                            placeholder="Describe the work done to resolve the issue..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Status Section -->
+                <div class="space-y-4">
+                    <h2 class="text-xl font-semibold text-gray-800 border-b pb-2 flex items-center">
+                        <i class="fas fa-clipboard-check mr-2 text-green-500"></i> Repair Status
+                    </h2>
+
+                    <div class="flex flex-wrap gap-4">
+                        <label class="radio-label">
+                            <input type="radio" name="repairStatus" value="complete" checked>
+                            <span class="radio-custom"></span>
+                            <span class="text-sm status-complete">Complete</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="repairStatus" value="incomplete">
+                            <span class="radio-custom"></span>
+                            <span class="text-sm status-incomplete">Incomplete</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="repairStatus" value="partially_working">
+                            <span class="radio-custom"></span>
+                            <span class="text-sm status-partial">Partially Working</span>
+                        </label>
+                    </div>
+
+                    <div id="partialDetails" class="hidden mt-3">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Partial Work Details</label>
+                        <textarea rows="3" class="w-full form-input px-4 py-2 rounded-lg"
+                            placeholder="Describe what parts are working and what still needs attention..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Parts Used -->
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-xl font-semibold text-gray-800 border-b pb-2 flex items-center">
+                            <i class="fas fa-box-open mr-2 text-yellow-500"></i> Parts Used/Replaced
+                        </h2>
+                        <button type="button" id="addRow"
+                            class="btn btn-primary px-4 py-2 rounded-lg text-sm flex items-center">
+                            <i class="fas fa-plus mr-1"></i> Add Part
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200" id="partsTable">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col"
+                                        class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Part Name</th>
+                                    <th scope="col"
+                                        class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Part Number</th>
+                                    <th scope="col"
+                                        class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Quantity</th>
+                                    <th scope="col"
+                                        class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Status</th>
+                                    <th scope="col"
+                                        class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <input type="text" required class="form-input w-full px-3 py-1 rounded">
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <input type="text" required class="form-input w-full px-3 py-1 rounded">
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <input type="number" min="1" value="1" required
+                                            class="form-input w-full px-3 py-1 rounded">
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <div class="flex space-x-4">
+                                            <label class="radio-label">
+                                                <input type="radio" name="status1" value="replaced" checked>
+                                                <span class="radio-custom"></span>
+                                                <span class="text-sm">Replaced</span>
+                                            </label>
+                                            <label class="radio-label">
+                                                <input type="radio" name="status1" value="required">
+                                                <span class="radio-custom"></span>
+                                                <span class="text-sm">Required</span>
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-center">
+                                        <button type="button" class="text-red-500 hover:text-red-700 removeRow">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Engineer Information -->
+                <div class="space-y-4">
+                    <h2 class="text-xl font-semibold text-gray-800 border-b pb-2 flex items-center">
+                        <i class="fas fa-user-tie mr-2 text-green-500"></i> Engineer Information
+                    </h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Engineer Name <span
+                                    class="text-red-500">*</span></label>
+                            <input type="text" required class="w-full form-input px-4 py-2 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Start Time <span
+                                    class="text-red-500">*</span></label>
+                            <input type="time" required class="w-full form-input px-4 py-2 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">End Time <span
+                                    class="text-red-500">*</span></label>
+                            <input type="time" required class="w-full form-input px-4 py-2 rounded-lg">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Verification Section -->
+                <div class="space-y-4">
+                    <h2 class="text-xl font-semibold text-gray-800 border-b pb-2 flex items-center">
+                        <i class="fas fa-user-check mr-2 text-purple-500"></i> Verification
+                    </h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Engineer's Verification</label>
+                            <div class="signature-box" id="engineerSignatureBox">
+                                <div id="engineerSignaturePad" class="signature-pad"></div>
+                                <span class="text-gray-500" id="engineerSignatureText">
+                                    <i class="fas fa-pen mr-2"></i>Click to sign
+                                </span>
+                            </div>
+                            <div class="mt-2">
+                                <input type="text" class="w-full form-input px-4 py-2 rounded-lg"
+                                    placeholder="Engineer's name" required>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Supervisor's
+                                Verification</label>
+                            <div class="signature-box" id="supervisorSignatureBox">
+                                <div id="supervisorSignaturePad" class="signature-pad"></div>
+                                <span class="text-gray-500" id="supervisorSignatureText">
+                                    <i class="fas fa-pen mr-2"></i>Click to sign
+                                </span>
+                            </div>
+                            <div class="mt-2">
+                                <input type="text" class="w-full form-input px-4 py-2 rounded-lg"
+                                    placeholder="Supervisor's name">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4 pt-4">
+                    <button type="reset" class="btn bg-gray-200 text-gray-800 px-6 py-2.5 rounded-lg hover:bg-gray-300">
+                        Reset Form
+                    </button>
+                    <button type="submit"
+                        class="btn btn-success px-6 py-2.5 rounded-lg text-white flex items-center justify-center">
+                        <i class="fas fa-paper-plane mr-2"></i> Submit Report
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg toast">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2 text-xl"></i>
+            <span>Report submitted successfully!</span>
+        </div>
+    </div>
+
+    <script>
+        // Set current date
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById("currentDate").innerText = new Date().toLocaleDateString('en-US', options);
+
+        // Add row functionality
+        document.getElementById("addRow").addEventListener("click", function () {
+            let table = document.getElementById("partsTable").getElementsByTagName('tbody')[0];
+            let newRow = table.insertRow();
+            let rowIndex = table.rows.length;
+
+            newRow.innerHTML = `
+                <td class="px-4 py-3 whitespace-nowrap">
+                    <input type="text" required class="form-input w-full px-3 py-1 rounded">
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                    <input type="text" required class="form-input w-full px-3 py-1 rounded">
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                    <input type="number" min="1" value="1" required class="form-input w-full px-3 py-1 rounded">
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                    <div class="flex space-x-4">
+                        <label class="radio-label">
+                            <input type="radio" name="status${rowIndex}" value="replaced" checked>
+                            <span class="radio-custom"></span>
+                            <span class="text-sm">Replaced</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="status${rowIndex}" value="required">
+                            <span class="radio-custom"></span>
+                            <span class="text-sm">Required</span>
+                        </label>
+                    </div>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-center">
+                    <button type="button" class="text-red-500 hover:text-red-700 removeRow">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            `;
+
+            // Add event listener to the new remove button
+            newRow.querySelector('.removeRow').addEventListener('click', function () {
+                table.removeChild(newRow);
+            });
+        });
+
+        // Add event listeners to existing remove buttons
+        document.querySelectorAll('.removeRow').forEach(button => {
+            button.addEventListener('click', function () {
+                const row = this.closest('tr');
+                row.parentNode.removeChild(row);
+            });
+        });
+
+        // Show/hide partial details based on status selection
+        document.querySelectorAll('input[name="repairStatus"]').forEach(radio => {
+            radio.addEventListener('change', function () {
+                const partialDetails = document.getElementById('partialDetails');
+                if (this.value === 'partially_working') {
+                    partialDetails.classList.remove('hidden');
+                } else {
+                    partialDetails.classList.add('hidden');
+                }
+            });
+        });
+
+        // Simple signature functionality (would need a proper library for real signatures)
+        document.getElementById('engineerSignatureBox').addEventListener('click', function () {
+            const text = document.getElementById('engineerSignatureText');
+            text.innerHTML = '<i class="fas fa-check mr-2"></i>Signed';
+            text.classList.remove('text-gray-500');
+            text.classList.add('text-green-600');
+        });
+
+        document.getElementById('supervisorSignatureBox').addEventListener('click', function () {
+            const text = document.getElementById('supervisorSignatureText');
+            text.innerHTML = '<i class="fas fa-check mr-2"></i>Signed';
+            text.classList.remove('text-gray-500');
+            text.classList.add('text-green-600');
+        });
+
+        // Form submission
+        document.getElementById('breakdownForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Validate form
+            const requiredInputs = this.querySelectorAll('[required]');
+            let isValid = true;
+
+            requiredInputs.forEach(input => {
+                if (!input.value.trim()) {
+                    input.classList.add('border-red-500');
+                    isValid = false;
+                } else {
+                    input.classList.remove('border-red-500');
+                }
+            });
+
+            if (!isValid) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            // Show success toast
+            const toast = document.getElementById('toast');
+            toast.classList.remove('hidden');
+
+            // Hide toast after 3 seconds
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+
+            // Here you would typically submit the form to a server
+            // For demo purposes, we'll just log the form data
+            const formData = new FormData(this);
+            console.log(Object.fromEntries(formData));
+
+            // Reset form after submission (optional)
+            // this.reset();
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .sidebar-btn.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .filter-option.active {
+            background-color: #e0f2fe;
+            color: #1d4ed8;
+            font-weight: 500;
+        }
+
+        .chart-container {
+            height: 300px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+
+            .sidebar,
+            .main-content {
+                width: 100% !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 font-['Inter'] p-4 md:p-8">
+    <div class="bg-white rounded-xl shadow-lg max-w-6xl mx-auto p-6 relative overflow-hidden">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-2xl font-bold text-gray-800">Employee Analytics Dashboard</h1>
+            <div class="text-gray-600 font-medium" id="current-date"></div>
+        </div>
+
+        <div class="flex gap-6 dashboard-container">
+            <!-- Sidebar -->
+            <div class="w-1/4 bg-gray-50 rounded-lg p-4 flex flex-col gap-3 sidebar">
+                <input type="text" placeholder="Search ID/name..."
+                    class="rounded-full px-4 py-2 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all"
+                    id="search-input">
+
+                <button class="sidebar-btn rounded-lg p-3 text-left hover:bg-gray-100 transition-colors active"
+                    data-view="breakdown">
+                    <div class="font-medium">Task Completion</div>
+                    <div class="text-sm text-gray-500">Breakdown complete/incomplete</div>
+                </button>
+
+                <button class="sidebar-btn rounded-lg p-3 text-left hover:bg-gray-100 transition-colors"
+                    data-view="pm-status">
+                    <div class="font-medium">PM Status</div>
+                    <div class="text-sm text-gray-500">PM complete/incomplete</div>
+                </button>
+
+                <button class="sidebar-btn rounded-lg p-3 text-left hover:bg-gray-100 transition-colors"
+                    data-view="hours">
+                    <div class="font-medium">Working Hours</div>
+                    <div class="text-sm text-gray-500">Daily/weekly analysis</div>
+                </button>
+
+                <button class="sidebar-btn rounded-lg p-3 text-left hover:bg-gray-100 transition-colors"
+                    data-view="location">
+                    <div class="font-medium">Live Location</div>
+                    <div class="text-sm text-gray-500">Employee tracking</div>
+                </button>
+            </div>
+
+            <!-- Main Content -->
+            <div class="w-3/4 main-content">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-700" id="chart-title">Task Completion Overview</h2>
+
+                    <div class="flex gap-2 bg-gray-100 rounded-full p-1">
+                        <button class="filter-option rounded-full px-4 py-1 text-sm active"
+                            data-period="day">Today</button>
+                        <button class="filter-option rounded-full px-4 py-1 text-sm" data-period="week">Week</button>
+                        <button class="filter-option rounded-full px-4 py-1 text-sm" data-period="month">Month</button>
+                    </div>
+                </div>
+
+                <!-- Chart Container -->
+                <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm chart-container">
+                    <canvas id="analyticsChart"></canvas>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-end gap-3 mt-6">
+                    <button
+                        class="bg-white border border-gray-300 rounded-full px-6 py-2 hover:bg-gray-50 transition-colors flex items-center gap-2"
+                        id="print-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                        </svg>
+                        Print
+                    </button>
+                    <a href="settings.html">
+                        <button
+                            class="bg-blue-600 text-white rounded-full px-6 py-2 hover:bg-blue-700 transition-colors flex items-center gap-2"
+                            id="home-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                            Home
+                        </button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set current date
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', options);
+
+        // Initialize Chart
+        const ctx = document.getElementById('analyticsChart').getContext('2d');
+        let chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Completed', 'Incomplete', 'In Progress', 'Pending Review'],
+                datasets: [{
+                    label: 'Tasks',
+                    data: [65, 15, 10, 10],
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.7)',
+                        'rgba(239, 68, 68, 0.7)',
+                        'rgba(234, 179, 8, 0.7)',
+                        'rgba(156, 163, 175, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(239, 68, 68, 1)',
+                        'rgba(234, 179, 8, 1)',
+                        'rgba(156, 163, 175, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function (value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // Sidebar navigation
+        const sidebarBtns = document.querySelectorAll('.sidebar-btn');
+        sidebarBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                sidebarBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                const view = this.dataset.view;
+                updateChart(view);
+            });
+        });
+
+        // Filter options
+        const filterOptions = document.querySelectorAll('.filter-option');
+        filterOptions.forEach(option => {
+            option.addEventListener('click', function () {
+                filterOptions.forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+
+                // In a real app, you would fetch new data based on the period
+                // For now, we'll just simulate it
+                simulateDataRefresh(this.dataset.period);
+            });
+        });
+
+        // Button actions
+        document.getElementById('print-btn').addEventListener('click', () => {
+            alert('Print functionality would open the print dialog in a real application');
+            // window.print();
+        });
+
+        document.getElementById('home-btn').addEventListener('click', () => {
+            alert('Navigating to home page');
+            // window.location.href = '/';
+        });
+
+        // Search functionality
+        document.getElementById('search-input').addEventListener('input', function (e) {
+            console.log('Searching for:', e.target.value);
+            // In a real app, you would filter data based on the search term
+        });
+
+        // Helper functions
+        function updateChart(view) {
+            const titleMap = {
+                'breakdown': 'Task Completion Overview',
+                'pm-status': 'PM Status Analysis',
+                'hours': 'Working Hours Analysis',
+                'location': 'Employee Location Data'
+            };
+
+            document.getElementById('chart-title').textContent = titleMap[view];
+
+            // In a real app, you would fetch new data based on the view
+            // For now, we'll just update the chart with sample data
+            const sampleData = {
+                'breakdown': [65, 15, 10, 10],
+                'pm-status': [80, 20],
+                'hours': [8, 7.5, 9, 8.25, 7, 6.5, 0],
+                'location': [25, 35, 20, 20]
+            };
+
+            const sampleLabels = {
+                'breakdown': ['Completed', 'Incomplete', 'In Progress', 'Pending Review'],
+                'pm-status': ['PM Complete', 'PM Incomplete'],
+                'hours': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                'location': ['Office', 'Remote', 'Field', 'Leave']
+            };
+
+            chart.data.labels = sampleLabels[view];
+            chart.data.datasets[0].data = sampleData[view];
+            chart.update();
+        }
+
+        function simulateDataRefresh(period) {
+            console.log('Refreshing data for period:', period);
+            // In a real app, you would fetch data based on the selected period
+        }
+    </script>
+</body>
+
+</html>

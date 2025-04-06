@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Reports</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .service-card {
+            transition: all 0.3s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-icon {
+            transition: all 0.3s ease;
+        }
+
+        .service-card:hover .card-icon {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-indigo-600 to-indigo-800 shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <i class="fas fa-tools text-white text-2xl mr-3"></i>
+                    <h1 class="text-2xl font-bold text-white">Service Reports</h1>
+                </div>
+                <div class="text-white flex items-center">
+                    <span id="currentDate" class="text-indigo-100"></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Top Row Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+            <!-- BD Report Card -->
+            <a href="Breakdown.html" class="service-card">
+                <div class="bg-white rounded-xl shadow-md p-6 h-full flex flex-col items-center text-center">
+                    <div class="bg-red-100 p-4 rounded-full mb-4 card-icon">
+                        <i class="fas fa-exclamation-triangle text-red-600 text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Breakdown Report</h3>
+                    <p class="text-gray-500 mb-6">Document equipment failures</p>
+                    <button
+                        class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg transition-colors duration-200 flex items-center">
+                        Report <i class="fas fa-chevron-right ml-2 text-sm"></i>
+                    </button>
+                </div>
+            </a>
+
+            <!-- PM Report Card -->
+            <a href="Pmreport.html" class="service-card">
+                <div class="bg-white rounded-xl shadow-md p-6 h-full flex flex-col items-center text-center">
+                    <div class="bg-blue-100 p-4 rounded-full mb-4 card-icon">
+                        <i class="fas fa-clipboard-check text-blue-600 text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">PM Report</h3>
+                    <p class="text-gray-500 mb-6">Preventive maintenance records</p>
+                    <button
+                        class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors duration-200 flex items-center">
+                        Report <i class="fas fa-chevron-right ml-2 text-sm"></i>
+                    </button>
+                </div>
+            </a>
+        </div>
+
+        <!-- Bottom Row Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+            <!-- Installation Report Card -->
+            <a href="Installation.html" class="service-card">
+                <div class="bg-white rounded-xl shadow-md p-6 h-full flex flex-col items-center text-center">
+                    <div class="bg-green-100 p-4 rounded-full mb-4 card-icon">
+                        <i class="fas fa-screwdriver-wrench text-green-600 text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Installation Report</h3>
+                    <p class="text-gray-500 mb-6">New equipment setup records</p>
+                    <button
+                        class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors duration-200 flex items-center">
+                        Report <i class="fas fa-chevron-right ml-2 text-sm"></i>
+                    </button>
+                </div>
+            </a>
+
+            <!-- Update Report Card -->
+            <a href="Update.html" class="service-card">
+                <div class="bg-white rounded-xl shadow-md p-6 h-full flex flex-col items-center text-center">
+                    <div class="bg-purple-100 p-4 rounded-full mb-4 card-icon">
+                        <i class="fas fa-sync-alt text-purple-600 text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Update Report</h3>
+                    <p class="text-gray-500 mb-6">Equipment upgrade records</p>
+                    <button
+                        class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-lg transition-colors duration-200 flex items-center">
+                        Report <i class="fas fa-chevron-right ml-2 text-sm"></i>
+                    </button>
+                </div>
+            </a>
+        </div>
+
+        <!-- Home Button -->
+        <div class="flex justify-center">
+            <a href="Home.html"
+                class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-md transition-all duration-200">
+                <i class="fas fa-home text-xl"></i>
+            </a>
+        </div>
+    </main>
+
+    <script>
+        // Display current date
+        function displayDate() {
+            const today = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = today.toLocaleDateString('en-US', options);
+        }
+
+        // Initialize
+        window.onload = function () {
+            displayDate();
+        };
+    </script>
+</body>
+
+</html>

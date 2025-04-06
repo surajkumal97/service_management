@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add P.M</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen p-4 md:p-8">
+    <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
+        <!-- Header with gradient background -->
+        <div class="bg-gradient-to-r from-indigo-600 to-blue-500 p-6 md:p-8 text-white">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold">Monthly P.M Add</h1>
+                    <p class="text-blue-100 mt-1">Add and manage your equipment records</p>
+                </div>
+                <div id="currentDate" class="text-blue-100 text-sm md:text-base mt-2 md:mt-0"></div>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="p-6 md:p-8">
+            <!-- Filter section -->
+            <div
+                class="bg-indigo-50 rounded-lg p-4 mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div>
+                    <h3 class="font-medium text-indigo-800">Filter Records</h3>
+                    <p class="text-sm text-indigo-600">Narrow down by specific month</p>
+                </div>
+                <select id="filterMonth"
+                    class="w-full md:w-64 bg-white border-0 rounded-lg shadow-sm px-4 py-2 text-indigo-900 focus:ring-2 focus:ring-indigo-500">
+                    <option value="">All Months</option>
+                    <option value="01">January</option>
+                    <option value="02">February</option>
+                    <option value="03">March</option>
+                    <option value="04">April</option>
+                    <option value="05">May</option>
+                    <option value="06">June</option>
+                    <option value="07">July</option>
+                    <option value="08">August</option>
+                    <option value="09">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+            </div>
+
+            <!-- Form section -->
+            <form id="monthForm" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Hospital Name -->
+                    <div class="space-y-1">
+                        <label for="hospitalName" class="block text-sm font-medium text-gray-700">Hospital Name</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-hospital text-gray-400"></i>
+                            </div>
+                            <input type="text" id="hospitalName"
+                                class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                placeholder="Enter Hospital Name">
+                        </div>
+                    </div>
+
+                    <!-- Brand -->
+                    <div class="space-y-1">
+                        <label for="brand" class="block text-sm font-medium text-gray-700">Brand</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-tag text-gray-400"></i>
+                            </div>
+                            <input type="text" id="brand"
+                                class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                placeholder="Enter Brand">
+                        </div>
+                    </div>
+
+                    <!-- Model -->
+                    <div class="space-y-1">
+                        <label for="model" class="block text-sm font-medium text-gray-700">Model</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-microchip text-gray-400"></i>
+                            </div>
+                            <input type="text" id="model"
+                                class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                placeholder="Enter Model">
+                        </div>
+                    </div>
+
+                    <!-- System S.N -->
+                    <div class="space-y-1">
+                        <label for="systemSN" class="block text-sm font-medium text-gray-700">System S.N</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-barcode text-gray-400"></i>
+                            </div>
+                            <input type="text" id="systemSN"
+                                class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                placeholder="Enter System S.N">
+                        </div>
+                    </div>
+
+                    <!-- Month -->
+                    <div class="space-y-1">
+                        <label for="month" class="block text-sm font-medium text-gray-700">Month</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="far fa-calendar-alt text-gray-400"></i>
+                            </div>
+                            <select id="month"
+                                class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 appearance-none bg-white">
+                                <option value="01">January</option>
+                                <option value="02">February</option>
+                                <option value="03">March</option>
+                                <option value="04">April</option>
+                                <option value="05">May</option>
+                                <option value="06">June</option>
+                                <option value="07">July</option>
+                                <option value="08">August</option>
+                                <option value="09">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                                <i class="fas fa-chevron-down text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit button -->
+                <div class="flex justify-end">
+                    <button type="submit"
+                        class="inline-flex items-center px-6 py-3 border border-transparent rounded-lg shadow-sm text-white bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200">
+                        <i class="fas fa-plus-circle mr-2"></i>
+                        Add Record
+                    </button>
+                </div>
+            </form>
+
+            <!-- Home button -->
+
+            <div class="mt-10 flex justify-center">
+                <a href="pmstatus.html"
+                    class="inline-flex items-center px-4 py-2 border border-transparent rounded-full shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200">
+                    <i class="fas fa-home"></i>
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function displayDate() {
+            const today = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = today.toLocaleDateString('en-US', options);
+        }
+
+        document.getElementById('monthForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Form submission logic would go here
+            alert('Form submitted successfully!');
+            e.target.reset();
+        });
+
+        window.onload = displayDate;
+    </script>
+</body>
+
+</html>

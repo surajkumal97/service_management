@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incomplete PM Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        .table-container {
+            max-height: calc(100vh - 180px);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            border-radius: 9999px;
+            font-weight: 500;
+        }
+
+        .action-btn {
+            transition: all 0.2s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+
+<body class="font-sans bg-gray-50">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-primary-700 to-primary-800 shadow-md">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-tools text-white text-xl"></i>
+                    <h1 class="text-xl font-bold text-white">Incomplete PM Dashboard</h1>
+                </div>
+
+                <div class="relative w-full md:w-80">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-primary-100"></i>
+                    </div>
+                    <input type="text" id="searchInput" placeholder="Search by S.N or Hospital"
+                        class="w-full pl-10 pr-4 py-2 rounded-lg bg-primary-600 bg-opacity-30 text-white placeholder-primary-200 border border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-transparent transition-all"
+                        oninput="searchTable()">
+                </div>
+
+                <div class="flex items-center space-x-4 text-primary-100">
+                    <span id="currentDate" class="hidden sm:inline"></span>
+                    <span id="realTimeClock" class="font-medium"></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-white rounded-lg shadow p-4 border-l-4 border-yellow-500">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-sm text-gray-500">Pending PMs</p>
+                        <h3 class="text-2xl font-bold">24</h3>
+                    </div>
+                    <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4 border-l-4 border-red-500">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-sm text-gray-500">Overdue</p>
+                        <h3 class="text-2xl font-bold">5</h3>
+                    </div>
+                    <div class="p-3 rounded-full bg-red-100 text-red-600">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4 border-l-4 border-green-500">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-sm text-gray-500">Completed Today</p>
+                        <h3 class="text-2xl font-bold">8</h3>
+                    </div>
+                    <div class="p-3 rounded-full bg-green-100 text-green-600">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Section -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="table-container overflow-y-auto">
+                <table class="w-full">
+                    <thead class="bg-primary-50 text-primary-800">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-sm font-medium">Hospital</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium">Equipment</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium">S.N</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium">Due Date</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium">Status</th>
+                            <th class="px-6 py-3 text-right text-sm font-medium">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200" id="equipmentTable">
+                        <!-- Row 1 -->
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center">
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
+                                        <i class="fas fa-hospital text-primary-600"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="font-medium text-gray-900">City General Hospital</div>
+                                        <div class="text-sm text-gray-500">New York, NY</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm text-gray-900">Brand X</div>
+                                <div class="text-sm text-gray-500">Model Y</div>
+                            </td>
+                            <td class="px-6 py-4 font-medium">SN123456</td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm text-gray-900">May 15, 2023</div>
+                                <div class="text-xs text-gray-500">in 3 days</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="status-badge bg-yellow-100 text-yellow-800">
+                                    Pending
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex justify-end">
+                                    <button onclick="addPmDocumentation(this)"
+                                        class="action-btn bg-blue-100 text-blue-600 hover:bg-blue-200">
+                                        <i class="fas fa-plus"></i>
+                                        Add pending list
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Row 2 -->
+                        <tr class="hover:bg-gray-50 bg-gray-50">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center">
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
+                                        <i class="fas fa-hospital text-primary-600"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="font-medium text-gray-900">Regional Medical Center</div>
+                                        <div class="text-sm text-gray-500">Boston, MA</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm text-gray-900">Brand A</div>
+                                <div class="text-sm text-gray-500">Model B</div>
+                            </td>
+                            <td class="px-6 py-4 font-medium">SN654321</td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm text-gray-900">Apr 28, 2023</div>
+                                <div class="text-xs text-red-500">4 days overdue</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="status-badge bg-red-100 text-red-800 animate-pulse">
+                                    Overdue
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex justify-end">
+                                    <button onclick="addPmDocumentation(this)"
+                                        class="action-btn bg-blue-100 text-blue-600 hover:bg-blue-200">
+                                        <i class="fas fa-plus"></i>
+                                        Add pending list
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Row 3 -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center">
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
+                                        <i class="fas fa-hospital text-primary-600"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="font-medium text-gray-900">University Hospital</div>
+                                        <div class="text-sm text-gray-500">Chicago, IL</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm text-gray-900">Brand Z</div>
+                                <div class="text-sm text-gray-500">Model C</div>
+                            </td>
+                            <td class="px-6 py-4 font-medium">SN987654</td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm text-gray-900">May 20, 2023</div>
+                                <div class="text-xs text-gray-500">in 8 days</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="status-badge bg-yellow-100 text-yellow-800">
+                                    Pending
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex justify-end">
+                                    <button onclick="addPmDocumentation(this)"
+                                        class="action-btn bg-blue-100 text-blue-600 hover:bg-blue-200">
+                                        <i class="fas fa-plus"></i>
+                                        Add pending list
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Floating Action Button -->
+    <a href="Home.html" class="fixed bottom-6 right-6 z-40">
+        <button
+            class="w-12 h-12 rounded-full bg-primary-600 hover:bg-primary-700 text-white shadow-lg flex items-center justify-center transition-transform hover:scale-105">
+            <i class="fas fa-home text-xl"></i>
+        </button>
+    </a>
+
+    <script>
+        // Update real-time clock and date
+        function updateDateTime() {
+            const now = new Date();
+            const options = {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            document.getElementById("currentDate").textContent = now.toLocaleDateString(undefined, options);
+            document.getElementById("realTimeClock").textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+        setInterval(updateDateTime, 1000);
+        updateDateTime();
+
+        // Search functionality
+        function searchTable() {
+            const input = document.getElementById("searchInput").value.toLowerCase();
+            const rows = document.querySelectorAll("#equipmentTable tr");
+
+            rows.forEach(row => {
+                const sn = row.cells[2].textContent.toLowerCase();
+                const hospital = row.cells[0].textContent.toLowerCase();
+                row.style.display = (sn.includes(input) || hospital.includes(input)) ? "" : "none";
+            });
+        }
+
+        // Add PM Documentation function
+        function addPmDocumentation(button) {
+            // You can implement your documentation adding logic here
+            alert('Add to pending list functionality will go here');
+
+            // For example, you could open a modal or form to add documentation
+            // document.getElementById('addDocumentationModal').classList.remove('hidden');
+        }
+    </script>
+</body>
+
+</html>

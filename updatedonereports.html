@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Break dowan reports</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .table-row-hover:hover {
+            background-color: rgba(14, 165, 233, 0.05);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-transition {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .btn-transition:hover {
+            transform: translateY(-1px);
+        }
+
+        .search-input:focus {
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.3);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm py-4 px-6 flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+            <h1 class="text-xl font-semibold text-gray-800 hidden sm:block">Update report Tracker</h1>
+        </div>
+        <div class="flex items-center space-x-2">
+            <div class="flex items-center space-x-2">
+                <div
+                    class="h-8 w-8 rounded-full bg-primary-500 flex items-center justify-center text-white font-medium">
+                    JD
+                </div>
+                <span class="hidden md:inline text-sm font-medium text-gray-700">John Doe</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <!-- Header Section -->
+            <div class="p-6 border-b border-gray-100">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div>
+
+                        <p class="text-sm text-gray-500 mt-1">Track and manage medical equipment information</p>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <div class="relative flex-grow max-w-md">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-search text-gray-400"></i>
+                            </div>
+                            <input type="text"
+                                class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent placeholder-gray-400 text-sm transition-all search-input"
+                                placeholder="Search by S.N...">
+                        </div>
+                        <button
+                            class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-sm font-medium btn-transition whitespace-nowrap">
+                            <i class="fas fa-search mr-2"></i> Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Section -->
+            <div class="p-4 border-b border-gray-100 bg-gray-50">
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="flex items-center space-x-2">
+                        <label class="text-sm font-medium text-gray-700 whitespace-nowrap">Quick Filters:</label>
+                        <button id="filterByDay"
+                            class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-1.5 rounded-lg text-sm font-medium btn-transition whitespace-nowrap">
+                            <i class="fas fa-calendar-day mr-2"></i>Today
+                        </button>
+                        <button id="filterByMonth"
+                            class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-1.5 rounded-lg text-sm font-medium btn-transition whitespace-nowrap">
+                            <i class="fas fa-calendar-alt mr-2"></i>This Month
+                        </button>
+                        <button id="resetFilters"
+                            class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-1.5 rounded-lg text-sm font-medium btn-transition whitespace-nowrap">
+                            <i class="fas fa-sync-alt mr-2"></i>Reset
+                        </button>
+                    </div>
+
+                    <div class="ml-auto flex items-center space-x-2">
+                        <button
+                            class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-1.5 rounded-lg text-sm font-medium btn-transition whitespace-nowrap">
+                            <i class="fas fa-plus mr-2"></i>Add Record
+                        </button>
+                        <button
+                            class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-3 py-1.5 rounded-lg text-sm font-medium btn-transition">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table Section -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200" id="dataTable">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <div class="flex items-center">
+                                    Hospital Name
+                                    <button class="ml-1 text-gray-400 hover:text-gray-600">
+                                        <i class="fas fa-sort"></i>
+                                    </button>
+                                </div>
+                            </th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Brand
+                            </th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Model
+                            </th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                System S.N
+                            </th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Date
+                            </th>
+                            <th scope="col"
+                                class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr class="table-row-hover transition-all" data-date="2025-04-03">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 bg-primary-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-hospital text-primary-600"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">Example Hospital</div>
+                                        <div class="text-sm text-gray-500">New York, NY</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">Brand A</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    Model X
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                SN123456
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">April 3, 2025</div>
+                                <div class="text-sm text-gray-500">Today</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                                <button
+                                    class="bg-primary-600 hover:bg-primary-700 text-white px-3 py-1 rounded text-sm font-medium btn-transition">
+                                    <i class="fas fa-eye mr-1"></i> View
+                                </button>
+                                <button
+                                    class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm font-medium btn-transition">
+                                    <i class="fas fa-print mr-1"></i> Print
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="table-row-hover transition-all" data-date="2025-03-25">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 bg-primary-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-clinic-medical text-primary-600"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">City Medical</div>
+                                        <div class="text-sm text-gray-500">Boston, MA</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">Brand B</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                    Model Y
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                SN987654
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">March 25, 2025</div>
+                                <div class="text-sm text-gray-500">1 week ago</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                                <button
+                                    class="bg-primary-600 hover:bg-primary-700 text-white px-3 py-1 rounded text-sm font-medium btn-transition">
+                                    <i class="fas fa-eye mr-1"></i> View
+                                </button>
+                                <button
+                                    class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm font-medium btn-transition">
+                                    <i class="fas fa-print mr-1"></i> Print
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="table-row-hover transition-all" data-date="2025-04-01">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div
+                                        class="flex-shrink-0 h-10 w-10 bg-primary-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-procedures text-primary-600"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">General Clinic</div>
+                                        <div class="text-sm text-gray-500">Chicago, IL</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">Brand C</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span
+                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
+                                    Model Z
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                SN111222
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">April 1, 2025</div>
+                                <div class="text-sm text-gray-500">2 days ago</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                                <button
+                                    class="bg-primary-600 hover:bg-primary-700 text-white px-3 py-1 rounded text-sm font-medium btn-transition">
+                                    <i class="fas fa-eye mr-1"></i> View
+                                </button>
+                                <button
+                                    class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm font-medium btn-transition">
+                                    <i class="fas fa-print mr-1"></i> Print
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700">
+                            Showing <span class="font-medium">1</span> to <span class="font-medium">3</span> of <span
+                                class="font-medium">3</span> results
+                        </p>
+                    </div>
+                    <div>
+                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                            <a href="#"
+                                class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <span class="sr-only">Previous</span>
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                            <a href="#" aria-current="page"
+                                class="z-10 bg-primary-50 border-primary-500 text-primary-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                1
+                            </a>
+                            <a href="#"
+                                class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                2
+                            </a>
+                            <a href="#"
+                                class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                3
+                            </a>
+                            <a href="#"
+                                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <span class="sr-only">Next</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Home Icon at Bottom Left -->
+    <div class="fixed bottom-4 left-4 z-50">
+        <a href="workdone.html"
+            class="text-primary-600 hover:text-primary-800 transition-colors bg-white p-3 rounded-full shadow-lg">
+            <i class="fas fa-house-chimney text-xl"></i>
+        </a>
+    </div>
+
+    <script>
+        // Filter by Day Button
+        document.getElementById('filterByDay').addEventListener('click', () => {
+            const today = new Date().toISOString().split('T')[0]; // Get today's date in "YYYY-MM-DD"
+            filterTableByDate(today);
+            updateActiveFilterButton('filterByDay');
+        });
+
+        // Filter by Month Button
+        document.getElementById('filterByMonth').addEventListener('click', () => {
+            const currentMonth = new Date().toISOString().slice(0, 7); // Get current month in "YYYY-MM"
+            filterTableByDate(currentMonth, true);
+            updateActiveFilterButton('filterByMonth');
+        });
+
+        // Reset Filters Button
+        document.getElementById('resetFilters').addEventListener('click', () => {
+            resetTableFilters();
+            updateActiveFilterButton(null);
+        });
+
+        // Function to filter the table rows by date
+        function filterTableByDate(date, isMonthFilter = false) {
+            const rows = document.querySelectorAll('#dataTable tbody tr');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const rowDate = row.getAttribute('data-date');
+                if (isMonthFilter) {
+                    // If filtering by month, check if the month part of the date matches
+                    if (rowDate.slice(0, 7) === date) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                } else {
+                    // If filtering by day, check if the full date matches
+                    if (rowDate === date) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+            });
+
+            updateResultsCount(visibleCount);
+        }
+
+        // Function to reset all filters
+        function resetTableFilters() {
+            const rows = document.querySelectorAll('#dataTable tbody tr');
+            rows.forEach(row => {
+                row.style.display = '';
+            });
+            updateResultsCount(rows.length);
+        }
+
+        // Function to update active filter button styling
+        function updateActiveFilterButton(activeButtonId) {
+            const filterButtons = ['filterByDay', 'filterByMonth', 'resetFilters'];
+
+            filterButtons.forEach(buttonId => {
+                const button = document.getElementById(buttonId);
+                if (buttonId === activeButtonId) {
+                    button.classList.remove('bg-white', 'border-gray-300', 'text-gray-700');
+                    button.classList.add('bg-primary-600', 'border-primary-600', 'text-white');
+                } else {
+                    button.classList.remove('bg-primary-600', 'border-primary-600', 'text-white');
+                    button.classList.add('bg-white', 'border-gray-300', 'text-gray-700');
+                }
+            });
+        }
+
+        // Function to update results count display
+        function updateResultsCount(count) {
+            // You can implement this to update the "Showing X to Y of Z results" text
+            // For now, it's just a placeholder
+            console.log(`Now showing ${count} records`);
+        }
+
+        // Initialize with no active filters
+        updateActiveFilterButton(null);
+    </script>
+</body>
+
+</html>

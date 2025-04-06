@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cargo Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .input-focus {
+            transition: all 0.2s ease;
+        }
+
+        .input-focus:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+
+        .table-container {
+            max-height: calc(100vh - 320px);
+            overflow-y: auto;
+        }
+
+        @media (max-width: 768px) {
+            .responsive-form {
+                flex-direction: column;
+            }
+
+            .responsive-form input,
+            .responsive-form select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-600 to-blue-800 shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <i class="fas fa-truck text-white text-2xl mr-3"></i>
+                    <h1 class="text-2xl font-bold text-white">Cargo Management</h1>
+                </div>
+                <div class="text-white flex items-center">
+                    <span id="currentDate" class="text-blue-100"></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6">
+        <!-- Search Section -->
+        <div class="mb-6 max-w-2xl mx-auto">
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fas fa-search text-gray-400"></i>
+                </div>
+                <input type="text" id="searchInput" placeholder="Search by Goods Name or Cargo Serial Number"
+                    class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 input-focus"
+                    onkeyup="searchTable()">
+            </div>
+        </div>
+
+        <!-- Form Section -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Add New Cargo</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 responsive-form">
+                <div>
+                    <label for="goodsName" class="block text-sm font-medium text-gray-700 mb-1">Goods Name</label>
+                    <input type="text" id="goodsName" placeholder="Enter Goods Name"
+                        class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 input-focus">
+                </div>
+                <div>
+                    <label for="transport" class="block text-sm font-medium text-gray-700 mb-1">Transport</label>
+                    <select id="transport"
+                        class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 input-focus">
+                        <option value="Road">Road</option>
+                        <option value="Air">Air</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                    <input type="date" id="date"
+                        class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 input-focus">
+                </div>
+                <div>
+                    <label for="sendBy" class="block text-sm font-medium text-gray-700 mb-1">Send By</label>
+                    <input type="text" id="sendBy" placeholder="Sender"
+                        class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 input-focus">
+                </div>
+                <div>
+                    <label for="weight" class="block text-sm font-medium text-gray-700 mb-1">Weight (kg)</label>
+                    <input type="number" id="weight" placeholder="Weight"
+                        class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 input-focus">
+                </div>
+                <div>
+                    <label for="cargoSN" class="block text-sm font-medium text-gray-700 mb-1">Cargo S/N</label>
+                    <input type="text" id="cargoSN" placeholder="Serial Number"
+                        class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 input-focus">
+                </div>
+            </div>
+            <div class="mt-4 flex justify-end">
+                <button onclick="addRow()"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow transition-colors duration-200 flex items-center">
+                    <i class="fas fa-plus-circle mr-2"></i> Add Cargo
+                </button>
+            </div>
+        </div>
+
+        <!-- Table Section -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="table-container">
+                <table class="w-full">
+                    <thead class="bg-blue-100 text-blue-800">
+                        <tr>
+                            <th class="px-4 py-3 text-left font-semibold text-sm uppercase tracking-wider">#</th>
+                            <th class="px-4 py-3 text-left font-semibold text-sm uppercase tracking-wider">Goods Name
+                            </th>
+                            <th class="px-4 py-3 text-left font-semibold text-sm uppercase tracking-wider">Transport
+                            </th>
+                            <th class="px-4 py-3 text-left font-semibold text-sm uppercase tracking-wider">Date</th>
+                            <th class="px-4 py-3 text-left font-semibold text-sm uppercase tracking-wider">Sender</th>
+                            <th class="px-4 py-3 text-left font-semibold text-sm uppercase tracking-wider">Weight (kg)
+                            </th>
+                            <th class="px-4 py-3 text-left font-semibold text-sm uppercase tracking-wider">Cargo S/N
+                            </th>
+                            <th class="px-4 py-3 text-left font-semibold text-sm uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200" id="dataTable">
+                        <!-- Rows will be added dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Home Button (Floating at bottom right) -->
+    <div class="fixed bottom-6 right-6">
+        <a href="Home.html"
+            class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg transition-all duration-200 transform hover:scale-110">
+            <i class="fas fa-home text-xl"></i>
+        </a>
+    </div>
+
+    <script>
+        // Display current date
+        function displayDate() {
+            const today = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = today.toLocaleDateString('en-US', options);
+        }
+
+        function addRow() {
+            let goodsName = document.getElementById("goodsName").value;
+            let transport = document.getElementById("transport").value;
+            let date = document.getElementById("date").value;
+            let sendBy = document.getElementById("sendBy").value;
+            let weight = document.getElementById("weight").value;
+            let cargoSN = document.getElementById("cargoSN").value;
+
+            if (!goodsName || !date || !sendBy || !weight || !cargoSN) {
+                alert("Please fill all required fields.");
+                return;
+            }
+
+            let table = document.getElementById("dataTable");
+            let rowCount = table.rows.length;
+            let row = table.insertRow(rowCount);
+
+            row.innerHTML = `
+                <td class="px-4 py-3 whitespace-nowrap">${rowCount + 1}</td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                    <input type="text" value="${goodsName}" class="w-full p-1 rounded border border-gray-300 focus:ring-1 focus:ring-blue-500">
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                    <select class="w-full p-1 rounded border border-gray-300 focus:ring-1 focus:ring-blue-500">
+                        <option value="Road" ${transport === "Road" ? "selected" : ""}>Road</option>
+                        <option value="Air" ${transport === "Air" ? "selected" : ""}>Air</option>
+                    </select>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                    <input type="date" value="${date}" class="w-full p-1 rounded border border-gray-300 focus:ring-1 focus:ring-blue-500">
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                    <input type="text" value="${sendBy}" class="w-full p-1 rounded border border-gray-300 focus:ring-1 focus:ring-blue-500">
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                    <input type="number" value="${weight}" class="w-full p-1 rounded border border-gray-300 focus:ring-1 focus:ring-blue-500">
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                    <input type="text" value="${cargoSN}" class="w-full p-1 rounded border border-gray-300 focus:ring-1 focus:ring-blue-500">
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap space-x-2">
+                    <button class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded shadow transition-colors duration-200" onclick="saveRow(this)">
+                        <i class="fas fa-save"></i>
+                    </button>
+                    <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded shadow transition-colors duration-200" onclick="deleteRow(this)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+
+            clearInputs();
+        }
+
+        function deleteRow(button) {
+            let row = button.closest('tr');
+            row.parentNode.removeChild(row);
+            updateRowNumbers();
+        }
+
+        function saveRow(button) {
+            let row = button.closest('tr');
+            let cells = row.cells;
+
+            let rowData = {
+                goodsName: cells[1].querySelector('input').value,
+                transport: cells[2].querySelector('select').value,
+                date: cells[3].querySelector('input').value,
+                sendBy: cells[4].querySelector('input').value,
+                weight: cells[5].querySelector('input').value,
+                cargoSN: cells[6].querySelector('input').value
+            };
+
+            console.log("Saved Data:", rowData);
+            alert("Cargo record saved!");
+        }
+
+        function updateRowNumbers() {
+            let table = document.getElementById("dataTable");
+            for (let i = 0; i < table.rows.length; i++) {
+                table.rows[i].cells[0].textContent = i + 1;
+            }
+        }
+
+        function clearInputs() {
+            document.getElementById("goodsName").value = "";
+            document.getElementById("transport").value = "Road";
+            document.getElementById("date").value = "";
+            document.getElementById("sendBy").value = "";
+            document.getElementById("weight").value = "";
+            document.getElementById("cargoSN").value = "";
+        }
+
+        function searchTable() {
+            let searchInput = document.getElementById("searchInput").value.toLowerCase();
+            let table = document.getElementById("dataTable");
+            let rows = table.rows;
+
+            for (let i = 0; i < rows.length; i++) {
+                let cells = rows[i].cells;
+                let goodsName = cells[1].querySelector('input').value.toLowerCase();
+                let cargoSN = cells[6].querySelector('input').value.toLowerCase();
+
+                if (goodsName.includes(searchInput) || cargoSN.includes(searchInput)) {
+                    rows[i].style.display = "";
+                } else {
+                    rows[i].style.display = "none";
+                }
+            }
+        }
+
+        // Initialize
+        window.onload = function () {
+            displayDate();
+            // Set default date to today
+            document.getElementById('date').valueAsDate = new Date();
+        };
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parts Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .sortable:hover {
+            background-color: #f3f4f6;
+            cursor: pointer;
+        }
+
+        .sort-asc::after {
+            content: " ↑";
+            font-size: 0.8em;
+        }
+
+        .sort-desc::after {
+            content: " ↓";
+            font-size: 0.8em;
+        }
+
+        .pagination-btn:hover:not(.disabled) {
+            background-color: #3b82f6;
+            color: white;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 p-4 md:p-8">
+    <div class="max-w-7xl mx-auto">
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <!-- Added Home Icon in the header -->
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-bold text-gray-800 flex items-center">
+                    <a href="spareparts.html" class="text-blue-500 hover:text-blue-700 mr-3">
+                        <i class="fas fa-home"></i>
+                    </a>
+                    Parts Required Dashboard
+                </h1>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-600">Welcome, Admin</span>
+                    <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters and Controls -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                <div class="relative w-full md:w-64">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </span>
+                    <input type="text" id="searchInput" placeholder="Search..."
+                        class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+                    <div class="flex items-center">
+                        <label for="dateFilter" class="mr-2 text-gray-700">Date Range:</label>
+                        <input type="date" id="dateFilter"
+                            class="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="flex items-center">
+                        <label for="rowsPerPage" class="mr-2 text-gray-700">Rows:</label>
+                        <select id="rowsPerPage"
+                            class="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="5">5</option>
+                            <option value="10" selected>10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table Container -->
+            <div class="overflow-x-auto rounded-lg border border-gray-200">
+                <table class="min-w-full bg-white" id="partsTable">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="py-3 px-4 text-left font-semibold text-gray-700 sortable" data-column="0">S.n
+                            </th>
+                            <th class="py-3 px-4 text-left font-semibold text-gray-700 sortable" data-column="1">
+                                Hospital name</th>
+                            <th class="py-3 px-4 text-left font-semibold text-gray-700 sortable" data-column="2">Parts
+                                name</th>
+                            <th class="py-3 px-4 text-left font-semibold text-gray-700 sortable" data-column="3">Parts
+                                number</th>
+                            <th class="py-3 px-4 text-left font-semibold text-gray-700 sortable" data-column="4">
+                                Required date</th>
+                            <th class="py-3 px-4 text-left font-semibold text-gray-700 sortable" data-column="5">
+                                Quantity</th>
+                            <th class="py-3 px-4 text-left font-semibold text-gray-700">Status</th>
+                            <th class="py-3 px-4 text-left font-semibold text-gray-700">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-gray-200">
+                        <!-- Data will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex flex-col sm:flex-row justify-between items-center mt-4 gap-4">
+                <div class="text-sm text-gray-600" id="paginationInfo">
+                    Showing 1 to 10 of 50 entries
+                </div>
+                <div class="flex gap-1" id="paginationControls">
+                    <button class="pagination-btn px-3 py-1 border rounded disabled" id="prevPage">Previous</button>
+                    <button class="pagination-btn px-3 py-1 border rounded bg-blue-500 text-white">1</button>
+                    <button class="pagination-btn px-3 py-1 border rounded">2</button>
+                    <button class="pagination-btn px-3 py-1 border rounded">3</button>
+                    <button class="pagination-btn px-3 py-1 border rounded" id="nextPage">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal (hidden by default) -->
+    <div id="detailsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">Part Details</h2>
+                <button id="closeModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="modalContent" class="space-y-4">
+                <!-- Content will be filled by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data - in a real app, this would come from an API
+        const sampleData = [
+            { id: 1, hospital: "City General Hospital", partName: "MRI Coil", partNumber: "MRI-2023-001", requiredDate: "2023-11-15", quantity: 2, status: "Pending", description: "High-resolution MRI coil for neurological imaging" },
+            { id: 2, hospital: "Regional Medical Center", partName: "X-Ray Tube", partNumber: "XRAY-4567", requiredDate: "2023-11-20", quantity: 1, status: "Approved", description: "High-capacity X-ray tube for radiography systems" },
+            { id: 3, hospital: "Children's Hospital", partName: "Ultrasound Probe", partNumber: "US-7890", requiredDate: "2023-12-05", quantity: 3, status: "Shipped", description: "Pediatric ultrasound probe with small footprint" },
+            { id: 4, hospital: "University Hospital", partName: "CT Scanner Gantry", partNumber: "CT-2023-004", requiredDate: "2023-12-10", quantity: 1, status: "Delivered", description: "64-slice CT scanner gantry assembly" },
+            { id: 5, hospital: "Veterans Hospital", partName: "Defibrillator Pads", partNumber: "DEFIB-123", requiredDate: "2023-11-25", quantity: 10, status: "Pending", description: "Adult defibrillator pads, box of 10 pairs" },
+            { id: 6, hospital: "City General Hospital", partName: "ECG Leads", partNumber: "ECG-456", requiredDate: "2023-12-01", quantity: 5, status: "Approved", description: "12-lead ECG cable set with patient connectors" },
+            { id: 7, hospital: "Regional Medical Center", partName: "Infusion Pump", partNumber: "INF-789", requiredDate: "2023-11-30", quantity: 2, status: "Pending", description: "Large volume infusion pump for critical care" },
+            { id: 8, hospital: "Children's Hospital", partName: "Nebulizer Kit", partNumber: "NEB-101", requiredDate: "2023-12-15", quantity: 20, status: "Approved", description: "Pediatric nebulizer kit with mask and tubing" },
+            { id: 9, hospital: "University Hospital", partName: "Surgical Light Bulb", partNumber: "LIGHT-2023", requiredDate: "2023-11-28", quantity: 4, status: "Shipped", description: "Halogen bulb for surgical light fixtures" },
+            { id: 10, hospital: "Veterans Hospital", partName: "Wheelchair Caster", partNumber: "WC-789", requiredDate: "2023-12-20", quantity: 6, status: "Pending", description: "Heavy-duty wheelchair caster wheel assembly" },
+            { id: 11, hospital: "City General Hospital", partName: "Patient Monitor", partNumber: "MON-456", requiredDate: "2023-12-05", quantity: 3, status: "Approved", description: "5-parameter patient monitoring system" },
+            { id: 12, hospital: "Regional Medical Center", partName: "Ventilator Circuit", partNumber: "VENT-123", requiredDate: "2023-12-10", quantity: 8, status: "Pending", description: "Adult ventilator breathing circuit with humidifier" },
+            { id: 13, hospital: "Children's Hospital", partName: "Pulse Oximeter", partNumber: "OXI-789", requiredDate: "2023-12-15", quantity: 5, status: "Shipped", description: "Pediatric finger pulse oximeter" },
+            { id: 14, hospital: "University Hospital", partName: "Surgical Instrument", partNumber: "SURG-2023", requiredDate: "2023-12-20", quantity: 12, status: "Pending", description: "Titanium surgical instrument set for OR" },
+            { id: 15, hospital: "Veterans Hospital", partName: "Hospital Bed Motor", partNumber: "BED-456", requiredDate: "2023-12-25", quantity: 2, status: "Approved", description: "Replacement motor for electric hospital bed" }
+        ];
+
+        // DOM elements
+        const tableBody = document.getElementById('tableBody');
+        const searchInput = document.getElementById('searchInput');
+        const dateFilter = document.getElementById('dateFilter');
+        const rowsPerPage = document.getElementById('rowsPerPage');
+        const paginationInfo = document.getElementById('paginationInfo');
+        const paginationControls = document.getElementById('paginationControls');
+        const prevPageBtn = document.getElementById('prevPage');
+        const nextPageBtn = document.getElementById('nextPage');
+        const detailsModal = document.getElementById('detailsModal');
+        const modalContent = document.getElementById('modalContent');
+        const closeModal = document.getElementById('closeModal');
+        const sortableHeaders = document.querySelectorAll('.sortable');
+        const homeIcon = document.querySelector('.fa-home');
+
+        // State variables
+        let currentPage = 1;
+        let rowsPerPageValue = parseInt(rowsPerPage.value);
+        let sortColumn = 0;
+        let sortDirection = 'asc';
+        let filteredData = [...sampleData];
+
+        // Initialize the table
+        function initTable() {
+            renderTable();
+            setupPagination();
+            setupEventListeners();
+        }
+
+        // Render the table with current data
+        function renderTable() {
+            // Filter data based on search and date
+            filterData();
+
+            // Sort data
+            sortData();
+
+            // Paginate data
+            const paginatedData = paginateData();
+
+            // Clear table body
+            tableBody.innerHTML = '';
+
+            // Add rows
+            paginatedData.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50';
+                tr.innerHTML = `
+                    <td class="py-3 px-4">${row.id}</td>
+                    <td class="py-3 px-4">${row.hospital}</td>
+                    <td class="py-3 px-4">${row.partName}</td>
+                    <td class="py-3 px-4">${row.partNumber}</td>
+                    <td class="py-3 px-4">${row.requiredDate}</td>
+                    <td class="py-3 px-4">${row.quantity}</td>
+                    <td class="py-3 px-4">
+                        <span class="px-2 py-1 text-xs rounded-full ${getStatusClass(row.status)}">
+                            ${row.status}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <button class="details-btn px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 mr-2" data-id="${row.id}">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="edit-btn px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600" data-id="${row.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+
+            // Update pagination info
+            updatePaginationInfo();
+        }
+
+        // Get CSS class for status badge
+        function getStatusClass(status) {
+            switch (status.toLowerCase()) {
+                case 'pending': return 'bg-yellow-100 text-yellow-800';
+                case 'approved': return 'bg-blue-100 text-blue-800';
+                case 'shipped': return 'bg-purple-100 text-purple-800';
+                case 'delivered': return 'bg-green-100 text-green-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        // Filter data based on search input and date filter
+        function filterData() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const dateFilterValue = dateFilter.value;
+
+            filteredData = sampleData.filter(item => {
+                const matchesSearch =
+                    item.hospital.toLowerCase().includes(searchTerm) ||
+                    item.partName.toLowerCase().includes(searchTerm) ||
+                    item.partNumber.toLowerCase().includes(searchTerm);
+
+                const matchesDate = dateFilterValue ? item.requiredDate === dateFilterValue : true;
+
+                return matchesSearch && matchesDate;
+            });
+        }
+
+        // Sort data based on current sort column and direction
+        function sortData() {
+            filteredData.sort((a, b) => {
+                let valueA, valueB;
+
+                switch (sortColumn) {
+                    case 0: valueA = a.id; valueB = b.id; break;
+                    case 1: valueA = a.hospital; valueB = b.hospital; break;
+                    case 2: valueA = a.partName; valueB = b.partName; break;
+                    case 3: valueA = a.partNumber; valueB = b.partNumber; break;
+                    case 4: valueA = a.requiredDate; valueB = b.requiredDate; break;
+                    case 5: valueA = a.quantity; valueB = b.quantity; break;
+                    default: return 0;
+                }
+
+                if (typeof valueA === 'string') {
+                    return sortDirection === 'asc'
+                        ? valueA.localeCompare(valueB)
+                        : valueB.localeCompare(valueA);
+                } else {
+                    return sortDirection === 'asc'
+                        ? valueA - valueB
+                        : valueB - valueA;
+                }
+            });
+        }
+
+        // Paginate data for current page
+        function paginateData() {
+            const startIndex = (currentPage - 1) * rowsPerPageValue;
+            const endIndex = startIndex + rowsPerPageValue;
+            return filteredData.slice(startIndex, endIndex);
+        }
+
+        // Update pagination information text
+        function updatePaginationInfo() {
+            const start = (currentPage - 1) * rowsPerPageValue + 1;
+            const end = Math.min(currentPage * rowsPerPageValue, filteredData.length);
+            const total = filteredData.length;
+
+            paginationInfo.textContent = `Showing ${start} to ${end} of ${total} entries`;
+
+            // Enable/disable pagination buttons
+            prevPageBtn.classList.toggle('disabled', currentPage === 1);
+            nextPageBtn.classList.toggle('disabled', currentPage >= Math.ceil(filteredData.length / rowsPerPageValue));
+        }
+
+        // Setup pagination controls
+        function setupPagination() {
+            const totalPages = Math.ceil(filteredData.length / rowsPerPageValue);
+
+            // Clear existing buttons (except prev/next)
+            while (paginationControls.children.length > 2) {
+                paginationControls.removeChild(paginationControls.lastChild);
+            }
+
+            // Add page number buttons
+            const maxVisiblePages = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+            // Adjust if we're at the beginning or end
+            if (endPage - startPage + 1 < maxVisiblePages) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+
+            // Add buttons
+            for (let i = startPage; i <= endPage; i++) {
+                const btn = document.createElement('button');
+                btn.className = `pagination-btn px-3 py-1 border rounded ${i === currentPage ? 'bg-blue-500 text-white' : ''}`;
+                btn.textContent = i;
+                btn.addEventListener('click', () => {
+                    currentPage = i;
+                    renderTable();
+                });
+
+                // Insert before the next button
+                paginationControls.insertBefore(btn, nextPageBtn);
+            }
+        }
+
+        // Show details modal
+        function showDetailsModal(id) {
+            const item = sampleData.find(i => i.id === id);
+            if (!item) return;
+
+            modalContent.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <h3 class="font-semibold text-gray-700">Hospital Information</h3>
+                        <p class="mt-1">${item.hospital}</p>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-700">Part Information</h3>
+                        <p class="mt-1"><span class="font-medium">Name:</span> ${item.partName}</p>
+                        <p class="mt-1"><span class="font-medium">Number:</span> ${item.partNumber}</p>
+                        <p class="mt-1"><span class="font-medium">Quantity:</span> ${item.quantity}</p>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-700">Dates</h3>
+                        <p class="mt-1"><span class="font-medium">Required by:</span> ${item.requiredDate}</p>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-700">Status</h3>
+                        <p class="mt-1">
+                            <span class="px-2 py-1 text-xs rounded-full ${getStatusClass(item.status)}">
+                                ${item.status}
+                            </span>
+                        </p>
+                    </div>
+                    <div class="md:col-span-2">
+                        <h3 class="font-semibold text-gray-700">Description</h3>
+                        <p class="mt-1">${item.description}</p>
+                    </div>
+                </div>
+                <div class="pt-4 flex justify-end space-x-3">
+                    <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                        <i class="fas fa-print mr-2"></i>Print
+                    </button>
+                    <button class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                        <i class="fas fa-check mr-2"></i>Approve
+                    </button>
+                </div>
+            `;
+
+            detailsModal.classList.remove('hidden');
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Search input
+            searchInput.addEventListener('input', () => {
+                currentPage = 1;
+                renderTable();
+            });
+
+            // Date filter
+            dateFilter.addEventListener('change', () => {
+                currentPage = 1;
+                renderTable();
+            });
+
+            // Rows per page
+            rowsPerPage.addEventListener('change', () => {
+                rowsPerPageValue = parseInt(rowsPerPage.value);
+                currentPage = 1;
+                renderTable();
+            });
+
+            // Pagination buttons
+            prevPageBtn.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderTable();
+                }
+            });
+
+            nextPageBtn.addEventListener('click', () => {
+                if (currentPage < Math.ceil(filteredData.length / rowsPerPageValue)) {
+                    currentPage++;
+                    renderTable();
+                }
+            });
+
+            // Sortable headers
+            sortableHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const column = parseInt(header.dataset.column);
+
+                    // If clicking the same column, toggle direction
+                    if (column === sortColumn) {
+                        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        // New column, default to ascending
+                        sortColumn = column;
+                        sortDirection = 'asc';
+                    }
+
+                    // Update sort indicators
+                    sortableHeaders.forEach(h => {
+                        h.classList.remove('sort-asc', 'sort-desc');
+                    });
+                    header.classList.add(sortDirection === 'asc' ? 'sort-asc' : 'sort-desc');
+
+                    renderTable();
+                });
+            });
+
+            // Details buttons (delegated event)
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.details-btn')) {
+                    const id = parseInt(e.target.closest('.details-btn').dataset.id);
+                    showDetailsModal(id);
+                }
+
+                if (e.target.closest('.edit-btn')) {
+                    const id = parseInt(e.target.closest('.edit-btn').dataset.id);
+                    alert(`Edit functionality would open for item ${id}`);
+                }
+            });
+
+            // Close modal
+            closeModal.addEventListener('click', () => {
+                detailsModal.classList.add('hidden');
+            });
+
+            // Close modal when clicking outside
+            detailsModal.addEventListener('click', (e) => {
+                if (e.target === detailsModal) {
+                    detailsModal.classList.add('hidden');
+                }
+            });
+
+            // Home icon click
+            homeIcon.addEventListener('click', (e) => {
+                e.preventDefault();
+                alert('Navigating to home page');
+                // In a real application, you would use:
+                // window.location.href = '/';
+            });
+        }
+
+        // Initialize the table when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initTable);
+    </script>
+</body>
+
+</html>
