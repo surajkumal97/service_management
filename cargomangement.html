@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cargo Tracking Cards</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .icon-circle {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .nav-icon {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-icon:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            transform: scale(1.05);
+        }
+
+        /* Custom gradient for navigation */
+        .nav-gradient {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+        }
+
+        /* Date display styling */
+        .date-display {
+            font-size: 0.9rem;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 font-sans">
+    <!-- Modern Top Navigation with Gradient -->
+    <nav class="nav-gradient shadow-sm py-3 px-6 flex justify-between items-center text-white">
+        <!-- Left side - Date Display -->
+        <div id="currentDate" class="date-display"></div>
+
+        <!-- Right side - User Icon -->
+        <div class="flex items-center space-x-4">
+            <div class="icon-circle bg-white bg-opacity-20 text-white shadow-md backdrop-blur-sm">
+                <i class="fas fa-user text-lg"></i>
+            </div>
+        </div>
+    </nav>
+
+    <section class="text-gray-700 body-font">
+        <div class="container px-5 py-12 mx-auto">
+            <div class="flex flex-wrap -m-4">
+                <!-- Card 1: Cargo Send -->
+
+                <div class="p-4 w-full md:w-1/2 lg:w-1/2 xl:w-1/2">
+                    <div
+                        class="h-full border border-gray-200 rounded-xl overflow-hidden shadow-sm card-hover bg-white flex flex-col">
+                        <div class="relative h-40 flex items-center justify-center">
+                            <i class="fas fa-paper-plane text-5xl text-blue-500"></i>
+                        </div>
+                        <div class="p-6 flex-grow flex flex-col items-center">
+                            <div class="mb-6 text-center">
+                                <h1 class="text-xl font-bold text-gray-900">Cargo Sent</h1>
+                            </div>
+                            <a href="cargosend.html">
+                                <button
+                                    class="text-white bg-blue-600 hover:bg-blue-700 px-8 py-2 rounded-lg text-sm font-medium transition-colors">
+                                    View Details <i class="fas fa-chevron-right ml-1"></i>
+                                </button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Card 2: Cargo Received -->
+
+                <div class="p-4 w-full md:w-1/2 lg:w-1/2 xl:w-1/2">
+                    <div
+                        class="h-full border border-gray-200 rounded-xl overflow-hidden shadow-sm card-hover bg-white flex flex-col">
+                        <div class="relative h-40 flex items-center justify-center">
+                            <i class="fas fa-box-open text-5xl text-green-500"></i>
+                        </div>
+                        <div class="p-6 flex-grow flex flex-col items-center">
+                            <div class="mb-6 text-center">
+                                <h1 class="text-xl font-bold text-gray-900">Cargo Received</h1>
+                            </div>
+                            <a href="Cargorecived.html"></a>
+                            <button
+                                class="text-white bg-green-600 hover:bg-green-700 px-8 py-2 rounded-lg text-sm font-medium transition-colors">
+                                View Details <i class="fas fa-chevron-right ml-1"></i>
+                            </button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- Home Button -->
+            <div class="flex justify-center mt-8">
+                <a href="Home.html"
+                    class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-md transition-all duration-200">
+                    <i class="fas fa-home text-xl"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Function to display current date
+        function displayCurrentDate() {
+            const dateElement = document.getElementById('currentDate');
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            };
+            const today = new Date();
+            dateElement.textContent = today.toLocaleDateString('en-US', options);
+        }
+
+        // Call the function when the page loads
+        window.onload = displayCurrentDate;
+    </script>
+</body>
+
+</html>
