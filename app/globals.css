@@ -2,6 +2,11 @@
 
 @layer base {
     body {
-        background-color: #f8fafc;
+        @apply bg-[#f8fafc];
+    }
+}
+@layer components {
+    .card {
+        @apply bg-white rounded-xl shadow-md p-6 h-full flex flex-col items-center text-center transition-all ease-in-out hover:-translate-y-1 hover:shadow-xl;
     }
 }
