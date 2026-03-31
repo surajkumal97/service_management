@@ -1,39 +1,32 @@
 import Container from "../components/container";
 import Items from "../components/items";
-import { IconName } from "lucide-react/dynamic";
+import { CornerUpLeft, Layers, RefreshCcw, ShoppingCart } from "lucide-react";
 
 const SpareParts = () => {
-  interface SparePart {
-    name: string;
-    description: string;
-    icon: IconName;
-    route: string;
-  }
-
-  const spareParts: SparePart[] = [
+  const spareParts = [
     {
       name: "Return Parts",
       description: "Record parts being returned",
-      icon: "corner-up-left",
-      route: "returnparts",
+      icon: "corner-up-left" as const,
+      route: "/spareparts/return",
     },
     {
       name: "Available Parts",
       description: "View parts currently in stock",
-      icon: "layers",
-      route: "availableparts",
+      icon: "layers" as const,
+      route: "/spareparts/available",
     },
     {
       name: "Parts Replacement",
       description: "Replace faulty parts",
-      icon: "refresh-ccw",
-      route: "partsreplacement",
+      icon: "refresh-ccw" as const,
+      route: "/spareparts/replacement",
     },
     {
       name: "Parts Required",
       description: "Request parts needed",
-      icon: "shopping-cart",
-      route: "partsrequired",
+      icon: "shopping-cart" as const,
+      route: "/spareparts/required",
     },
   ];
 

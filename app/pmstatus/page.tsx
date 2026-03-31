@@ -15,25 +15,25 @@ const PMStatus = () => {
       name: "Pending PM",
       description: "PMs awaiting completion",
       icon: "clock",
-      route: "",
+      route: "pending",
     },
     {
       name: "PM Done",
       description: "Completed PM records",
       icon: "circle-check",
-      route: "",
+      route: "done",
     },
     {
       name: "Incomplete PM",
       description: "PMs requiring follow-up",
       icon: "circle-alert",
-      route: "",
+      route: "incomplete",
     },
     {
       name: "Add PM",
       description: "Create new PM records",
       icon: "circle-plus",
-      route: "",
+      route: "add",
     },
   ];
   return (

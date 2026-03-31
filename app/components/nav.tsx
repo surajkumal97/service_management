@@ -20,12 +20,12 @@ const Nav = (): React.ReactNode => {
             <button className="bg-white/20 hover:bg-white/30 p-2 rounded-full transition-all duration-200">
               <User size={24} className="text-white" />
             </button>
-            <a href="login.html">
+            <Link href="/login">
               <button className="flex items-center bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg transition-colors duration-200">
                 <LogOut size={20} className="mr-2" />
                 <span className="hidden sm:inline">Logout</span>
               </button>
-            </a>
+            </Link>
           </div>
         </div>
       </div>

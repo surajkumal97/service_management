@@ -20,19 +20,19 @@ const Service = () => {
       name: "PM Report",
       description: "Preventive maintenance records",
       icon: "wrench",
-      route: "breakdown",
+      route: "/services/pmreport",
     },
     {
       name: "Installation Report",
       description: "New equipment setup records",
       icon: "hammer",
-      route: "breakdown",
+      route: "installation",
     },
     {
       name: "Update Report",
       description: "Equipment upgrade records",
       icon: "rotate-cw",
-      route: "breakdown",
+      route: "update",
     },
   ];
   return (

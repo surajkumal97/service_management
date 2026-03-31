@@ -26,7 +26,7 @@ export default function Home() {
       name: "Workdone Report",
       description: "Completed work reports",
       icon: "file-chart-column",
-      route: "/reports",
+      route: "/workdone",
     },
     {
       name: "Spare Parts List",
@@ -53,10 +53,10 @@ export default function Home() {
       route: "/tools",
     },
     {
-      name: "Settings",
-      description: "System configuration",
-      icon: "cog",
-      route: "/settings",
+      name: "Dashboard",
+      description: "Employee analytics",
+      icon: "bar-chart-2",
+      route: "/dashboard",
     },
   ];
   return (
